@@ -28,18 +28,19 @@ for t in teams:
         tmileage += mileage
     tbl.append([t[1], tgoal, tmileage*100/tgoal])
 tbl = sorted(tbl, key=lambda x: x[2], reverse = True)
-print('<div class="datagrid"><table>')
-print('  <thead><tr><th>Команда</th><th>Цель (км/нед)</th><th>Выполнено %</th><th>Очки</th></tr></thead>')
-print('  <tbody>')
+output = []
+output.append('<div class="datagrid"><table>')
+output.append('  <thead><tr><th>Команда</th><th>Цель (км/нед)</th><th>Выполнено %</th><th>Очки</th></tr></thead>')
+output.append('  <tbody>')
 odd = True
 for n, t in enumerate(tbl):
     alt = ' class="alt"' if odd else ''
     pts = len(teams)*5-n*5-5
-    print('  <tr{}><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(alt, t[0], t[1], t[2], pts))
+    output.append('  <tr{}><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(alt, t[0], t[1], t[2], pts))
     odd = not odd
-print('  </tbody>')
-print('</table></div>')
-
+output.append('  </tbody>')
+output.append('</table></div>')
+print('\n'.join(output))
  
 
 
