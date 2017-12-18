@@ -9,7 +9,7 @@ f = open('users.csv')
 reader = csv.reader(f)
 for row in reader:
     userid = int(row[1])
-    teamid = (userid % 4) + 1
+    teamid = int(row[4])
     goal = float(row[3])
     print(userid)
     print(teamid)
