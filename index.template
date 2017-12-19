@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <title>Соревнования 2018 in 2018 | Таблица</title>
+  <title>Соревнования 2018 в 2018 | Таблица</title>
   <meta content="http://aerobia.ru/assets/aerobia-2ebacfbc9d1c2bc03bfab224ec470e42.gif" property="og:image" />
   <link href="assets/application-1fd0a358e6b9e12ee7c6518fefc54274.css" media="screen" rel="stylesheet" type="text/css" />
 <style type="text/css">
@@ -13,33 +13,6 @@
 <header>
   <div>
     <strong class="logo ru"><a href="index.html">Aerobia</a></strong>
-
-      <!-- nav>
-        <ul>
-          <li class=""><a href="index.html">Старт</a></li>
-          <li class=""><a href="http://aerobia.ru/people">Люди</a></li>
-          <li class=""><a href="http://aerobia.ru/clubs">Клубы</a></li>
-          <li class=""><a href="http://aerobia.ru/challenges">Соревнования</a></li>
-          <li class=""><a href="http://aerobia.ru/events">События</a></li>
-        </ul>
-      </nav -->
-
-      <!-- div class="user">
-        <dl>
-          <dt><a href="index.html"><img alt="Dimitri ☮ Fruchtenstein" class="avatar thumbnail" src="uploads/avatar/40_1_thumbnail.jpg?1457087915" /></a> <a href="index.html">Dimitri ☮ Fruchtenstein</a></dt>
-          <dd>
-            <div>
-              <ul class="user-menu">
-                <li class="profile"><a href="http://aerobia.ru/users/40">Мой профиль</a></li>
-                <li class="settings"><a href="http://aerobia.ru/users/edit">Настройки</a></li>
-                <li class="sign-out"><a href="http://aerobia.ru/users/sign_out" data-method="delete" rel="nofollow">Выход</a></li>
-              </ul>
-            </div>
-          </dd>
-        </dl>
-      </div -->
-
-
   </div>
 </header>
 
@@ -48,7 +21,7 @@
       <div>
         <div class="name">
           <div>
-            <strong>2018 in<br>2018</strong>
+            <strong>2018 в<br>2018</strong>
           </div>
         </div>
         <nav>
@@ -116,69 +89,8 @@
 
         </td>
         <td>
-                        <center>
-                <h1>Таблица соревнования: результаты 50 недели</h1>
-            </center>
-            <div class="datagrid"><table>
-               <thead><tr><th>Команда</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено %</th><th>Очки</th></tr></thead>
-               <tbody>
-                 <tr class="alt"><td>Мурзилки</td><td>441.08</td><td>454.94</td><td>103.14</td><td>15</td></tr>
-                 <tr><td>Крокодилы</td><td>407.18</td><td>355.66</td><td>87.35</td><td>10</td></tr>
-                 <tr class="alt"><td>Ленивые тюлени</td><td>402.62</td><td>310.22</td><td>77.05</td><td>5</td></tr>
-                 <tr><td>Веселые картинки</td><td>444.58</td><td>328.64</td><td>73.92</td><td>0</td></tr>
-               </tbody>
-            </table></div>
+            $table
         </td>
-        <!-- td class="additional">
-
-
-
-  <aside class="inventory separate">
-      <h3><a href="http://aerobia.ru/users/40/gear">Инвентарь</a></h3>
-      <ul>
-          <li>
-              <a href="http://aerobia.ru/users/40/gear/8969"><img alt="Inov-8 Oroc 280" height="60" src="http://cdn.aerobia.ru/photos/186254_oroc_medium.jpg?1503644707" width="60" /></a>
-            <div class="description">
-              <a href="http://aerobia.ru/users/40/gear/8969">Inov-8 Oroc 280</a>
-                <i>16.15 км</i>
-            </div>
-          </li>
-          <li>
-              <a href="http://aerobia.ru/users/40/gear/8594"><img alt="Saucony Kinvara 7" height="60" src="http://cdn.aerobia.ru/photos/172683_kinvara_medium.jpg?1493462253" width="60" /></a>
-            <div class="description">
-              <a href="http://aerobia.ru/users/40/gear/8594">Saucony Kinvara 7</a>
-                <i>900.68 км</i>
-            </div>
-          </li>
-          <li>
-              <a href="http://aerobia.ru/users/40/gear/8719"><img alt="Saucony Kinvara 8" height="60" src="http://cdn.aerobia.ru/photos/176664_k8_medium.jpg?1495966198" width="60" /></a>
-            <div class="description">
-              <a href="http://aerobia.ru/users/40/gear/8719">Saucony Kinvara 8</a>
-                <i>551.8 км</i>
-            </div>
-          </li>
-      </ul>
-    <a href="http://aerobia.ru/inventories/new" class="button stretch modal">Добавить инвентарь</a>
-  </aside>
-
-
-  <aside class="events separate">
-    <h3><a href="http://aerobia.ru/users/40/events">События</a></h3>
-    <ul>
-        <li>
-          <a href="http://aerobia.ru/events/1415" class="sport active"><img alt="Бег" src="uploads/sports_small/2_4_2_running_w_white.png?1346240783" /></a>
-          <div>
-            <p>10 дек.</p>
-            <b><a href="http://aerobia.ru/events/1415">Mad Fox Ultra 2017</a></b>
-          </div>
-        </li>
-    </ul>
-  </aside>
-
-
-  
-
-        </td -->
       </tr>
     </table>
   </div>
