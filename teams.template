@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <title>Соревнования 2018 в 2018 | Таблица</title>
+  <title>Соревнования 2018 в 2018 | Команды</title>
   <meta content="http://aerobia.ru/assets/aerobia-2ebacfbc9d1c2bc03bfab224ec470e42.gif" property="og:image" />
   <link href="assets/application-1fd0a358e6b9e12ee7c6518fefc54274.css" media="screen" rel="stylesheet" type="text/css" />
 <style type="text/css">
@@ -26,9 +26,9 @@
         </div>
         <nav>
             <ul>
-                <li class="workouts active"><a href="index.html"><span></span>Таблица</a></li>
+                <li class="workouts"><a href="index.html"><span></span>Таблица</a></li>
                 <!-- li class="users"><a href="workouts.html"><span></span>Тренировки</a></li -->
-                <li class="friends"><a href="teams.html"><span></span>Команды</a></li>
+                <li class="friends active"><a href="teams.html"><span></span>Команды</a></li>
                 <li class="statistics"><a href="statistics.html"><span></span>Статистика</a></li>
             </ul>
         </nav>
@@ -89,32 +89,10 @@
 
         </td>
         <td>
-                        <center>
-                <h1>Результаты 50 недели</h1>
-            </center>
-            <div class="datagrid"><table>
-               <thead><tr><th>Команда</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено (%)</th><th>Очки</th></tr></thead>
-               <tbody>
-                 <tr class="alt"><td>раз</td><td>515.73</td><td>442.65</td><td>94.96</td><td>15</td></tr>
-                 <tr><td>два</td><td>509.45</td><td>433.31</td><td>87.16</td><td>10</td></tr>
-                 <tr class="alt"><td>три</td><td>519.58</td><td>457.50</td><td>87.04</td><td>5</td></tr>
-                 <tr><td>четыре</td><td>516.08</td><td>399.40</td><td>79.81</td><td>0</td></tr>
-               </tbody>
-            </table></div>
+            $table
             <br />
-                        <center>
-                <h1>Таблица соревнования на 50 неделю</h1>
-            </center>
-            <div class="datagrid"><table>
-               <thead><tr><th>Команда</th><th>Очки</th></tr></thead>
-               <tbody>
-                 <tr class="alt"><td>раз</td><td>15</td></tr>
-                 <tr><td>два</td><td>10</td></tr>
-                 <tr class="alt"><td>три</td><td>5</td></tr>
-                 <tr><td>четыре</td><td>0</td></tr>
-               </tbody>
-            </table></div>
-            <br />
+
+
         </td>
       </tr>
     </table>

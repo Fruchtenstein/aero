@@ -59,7 +59,7 @@
           <b><a href="http://aerobia.ru/clubs/190">Аэробия</a></b>
         </div>
       </li>
-      <li>
+<!--      <li>
         <a href="http://aerobia.ru/clubs/388" class="avatar"><img src="http://cdn.aerobia.ru/entities/388_club1_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/388">Веселые картинки</a></b>
@@ -82,7 +82,7 @@
         <div>
           <b><a href="http://aerobia.ru/clubs/391">Ленивые тюлени</a></b>
         </div>
-      </li>
+      </li> -->
   </ul>
 </aside>
 
@@ -90,6 +90,9 @@
         </td>
         <td>
             $table
+            <br />
+            $table2
+            <br />
         </td>
       </tr>
     </table>

@@ -6,6 +6,8 @@ sqlite3 db aerobia.db
 db eval {CREATE TABLE teams (teamid INTEGER PRIMARY KEY, teamname)}
 db eval {CREATE TABLE runners (runnerid INTEGER PRIMARY KEY, runnername, teamid INTEGER, goal REAL)}
 db eval {CREATE TABLE log (runnerid INTEGER, week INTEGER, distance REAL, PRIMARY KEY(runnerid, week))}
+db eval {CREATE TABLE tlog (teamid INTEGER, week INTEGER, pts INTEGER, result REAL)}
+db eval {CREATE TABLE tlog2 (teamid INTEGER, week INTEGER, pts INTEGER, result REAL)}
 db eval {INSERT INTO teams values (1, "раз")}
 db eval {INSERT INTO teams values (2, "два")}
 db eval {INSERT INTO teams values (3, "три")}
