@@ -40,15 +40,15 @@ def getDistance(runnerid, date):
         rundate = datetime.date(year,month,day)
         d = dist.split()
         distance = float(d[0])
-        print("-----rundate", rundate)
-        print("-----week", rundate.isocalendar()[1])
-        print("-----type", type)
-        print("-----distance", distance)
+#        print("-----rundate", rundate)
+#        print("-----week", rundate.isocalendar()[1])
+#        print("-----type", type)
+#        print("-----distance", distance)
         if (rundate.isocalendar()[1] == date.isocalendar()[1] and date.year == year):
-#            print("-----rundate", rundate)
-#            print("-----week", rundate.isocalendar()[1])
-#            print("-----", type)
-#            print("-----distance", distance)
+            print("-----rundate", rundate)
+            print("-----week", rundate.isocalendar()[1])
+            print("-----", type)
+            print("-----distance", distance)
             total += distance
     return (username, total)
 
@@ -81,7 +81,15 @@ invmonths = {v: k for k, v in months.items()}
 ###client = gspread.authorize(creds)
 ###sheet = client.open("2018in2018").sheet1
 
+print("-------------------- ",datetime.datetime.now())
+loadDB(now - datetime.timedelta(days=70))
+loadDB(now - datetime.timedelta(days=63))
+loadDB(now - datetime.timedelta(days=56))
+loadDB(now - datetime.timedelta(days=49))
+loadDB(now - datetime.timedelta(days=42))
+loadDB(now - datetime.timedelta(days=35))
+loadDB(now - datetime.timedelta(days=28))
 loadDB(now - datetime.timedelta(days=21))
 loadDB(now - datetime.timedelta(days=14))
 loadDB(now - datetime.timedelta(days=7))
-
+print("-------------------- ",datetime.datetime.now())
