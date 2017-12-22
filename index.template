@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <title>Соревнования 2018 в 2018 | Таблица</title>
+  <title>Соревнования на Кубок Аэробии | Таблица</title>
   <meta content="http://aerobia.ru/assets/aerobia-2ebacfbc9d1c2bc03bfab224ec470e42.gif" property="og:image" />
   <link href="assets/application-1fd0a358e6b9e12ee7c6518fefc54274.css" media="screen" rel="stylesheet" type="text/css" />
 <style type="text/css">
@@ -19,9 +19,11 @@
   <aside class="current user">
     <div>
       <div>
+      </div>
         <div class="name">
+        <img class="fix" src="assets/cup3.jpg" />
           <div>
-            <strong>2018 в<br>2018</strong>
+            <strong>Кубок Аэробии</strong>
           </div>
         </div>
         <nav>
@@ -47,6 +49,12 @@
           <aside class="clubs separate">
   <h3><a href="http://aerobia.ru/my/clubs">Клубы</a></h3>
   <ul>
+      <li>
+        <a href="http://aerobia.ru/clubs/413" class="avatar"><img src="http://cdn.aerobia.ru/entities/413_cup3_thumbnail.jpg" /></a>
+        <div>
+          <b><a href="http://aerobia.ru/clubs/413">Кубок Аэробии</a></b>
+        </div>
+      </li>
       <li>
         <a href="http://aerobia.ru/clubs/153" class="avatar"><img src="http://cdn.aerobia.ru/entities/153_Boston-Running-Routes_thumbnail.jpg" /></a>
         <div>

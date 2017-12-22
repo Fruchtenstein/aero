@@ -5,7 +5,7 @@ import sqlite3
 
 db = sqlite3.connect('aerobia.db')
 c = db.cursor()
-nofteams = 8
+nofteams = 6
 teams=[]
 goals=[]
 for i in range(0,nofteams):
@@ -26,6 +26,7 @@ for i, t in enumerate(teams):
         print(r[0], r[1], r[2])
         c.execute('INSERT OR REPLACE INTO runners  VALUES (?, ?, ?, ?, 0)', (r[1], r[0], i+1, r[2]))
     print("")
+    c.execute('INSERT OR REPLACE INTO teams VALUES (?, ?)', (i+1,i+1))
 db.commit()
 db.close()
 f.close()

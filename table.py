@@ -17,7 +17,7 @@ def mkIndex(week):
         tmileage = 0
         tpercentage = 0
         for r in runners:
-            rmileage = c1.execute('SELECT coalesce(sum(distance),0) FROM log WHERE runnerid=? AND week=?', (r[0], week)).fetchone()[0]
+            rmileage = c1.execute('SELECT coalesce(sum(distance),0) FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()[0]
             rgoal = c1.execute('SELECT goal FROM runners WHERE runnerid=? AND isill=0', (r[0],)).fetchone()[0]/52
             print(r[0], week, rmileage, rgoal)
             print("{}: {:.2f} {:.2f} {:.2f}".format(r[0], rmileage, rgoal, rmileage*100/rgoal))
@@ -109,7 +109,7 @@ def mkTeams(week):
         for r in runners:
             alt = ' class="alt"' if odd else ''
             if r[4]==0:
-                rmileage = c1.execute('SELECT distance FROM log WHERE runnerid=? AND week=?', (r[0], week)).fetchone()[0]
+                rmileage = c1.execute('SELECT distance FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()[0]
                 rgoal = r[3]/52
             else:
                 rmileage = 0
