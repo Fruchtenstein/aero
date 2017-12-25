@@ -135,8 +135,9 @@ def mkStat(week):
     outstat = []
     outstat.append('            <br />')
     outstat.append('            <center>')
-    outstat.append('                <h1>Лучший бегун {} недели</h1>:'.format(week))
+    outstat.append('                <h1>Лучший бегун {} недели:</h1>'.format(week))
     outstat.append('                <h1>Dimitri ☮ Fruchtenstein</h1>'.format(week))
+    outstat.append('                (по совокупности заслуг)'.format(week))
     outstat.append('            </center>')
     outstat.append('')
     

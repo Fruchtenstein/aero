@@ -5,7 +5,7 @@ import sqlite3
 
 db = sqlite3.connect('aerobia.db')
 c = db.cursor()
-nofteams = 6
+nofteams = 8
 teams=[]
 goals=[]
 for i in range(0,nofteams):
