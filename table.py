@@ -104,7 +104,7 @@ def mkTeams(week):
         outteam.append('            <div class="datagrid"><table>')
         outteam.append('               <thead><tr><th>Имя</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено (%)</th></tr></thead>')
         outteam.append('               <tbody>')
-        runners = c1.execute('SELECT * FROM runners WHERE teamid=?', (t[0],)).fetchall()
+        runners = c1.execute('SELECT * FROM runners WHERE teamid=? ORDER BY runnername', (t[0],)).fetchall()
         odd = True
         for r in runners:
             alt = ' class="alt"' if odd else ''
@@ -114,7 +114,7 @@ def mkTeams(week):
             else:
                 rmileage = 0
                 rgoal = 0
-            outteam.append('                 <tr{}><td>{}</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr>'.format(alt, r[1], rgoal, rmileage, rmileage*100/rgoal))
+            outteam.append('                 <tr{}><td><a href="http://aerobia.ru/users/{}">{}</a></td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr>'.format(alt, r[0], r[1], rgoal, rmileage, rmileage*100/rgoal))
             odd = not odd
         outteam.append('               </tbody>')
         outteam.append('            </table></div>')
@@ -136,8 +136,8 @@ def mkStat(week):
     outstat.append('            <br />')
     outstat.append('            <center>')
     outstat.append('                <h1>Лучший бегун {} недели:</h1>'.format(week))
-    outstat.append('                <h1>Dimitri ☮ Fruchtenstein</h1>'.format(week))
-    outstat.append('                (по совокупности заслуг)'.format(week))
+    outstat.append('                <h1>Митя ☮ Фруктенштейн</h1>'.format(week))
+    outstat.append('                (за все хорошее)'.format(week))
     outstat.append('            </center>')
     outstat.append('')
     

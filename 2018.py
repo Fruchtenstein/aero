@@ -73,7 +73,9 @@ def loadDB(date):
     db.close()
 
 
-now = datetime.date.today()
+when = datetime.date.today() - datetime.timedelta(days=7)
+#onemonthago = when.replace(day=1)-datetime.timedelta(days=1)
+#twomonthago = onemonthago.replace(day=1)-datetime.timedelta(days=1)
 months = {'янв.':1,'фев.':2,'мар.':3,'апр.':4,'мая':5,'июня':6,'июля':7,'авг.':8,'сент.':9,'окт.':10,'нояб.':11,'дек.':12}
 invmonths = {v: k for k, v in months.items()}
 ###scope = ['https://spreadsheets.google.com/feeds']
@@ -82,14 +84,16 @@ invmonths = {v: k for k, v in months.items()}
 ###sheet = client.open("2018in2018").sheet1
 
 print("-------------------- ",datetime.datetime.now())
-loadDB(now - datetime.timedelta(days=70))
-loadDB(now - datetime.timedelta(days=63))
-loadDB(now - datetime.timedelta(days=56))
-loadDB(now - datetime.timedelta(days=49))
-loadDB(now - datetime.timedelta(days=42))
-loadDB(now - datetime.timedelta(days=35))
-loadDB(now - datetime.timedelta(days=28))
-loadDB(now - datetime.timedelta(days=21))
-loadDB(now - datetime.timedelta(days=14))
-loadDB(now - datetime.timedelta(days=7))
+#loadDB(now - datetime.timedelta(days=70))
+#loadDB(now - datetime.timedelta(days=63))
+#loadDB(now - datetime.timedelta(days=56))
+#loadDB(now - datetime.timedelta(days=49))
+#loadDB(now - datetime.timedelta(days=42))
+#loadDB(now - datetime.timedelta(days=35))
+#loadDB(now - datetime.timedelta(days=28))
+#loadDB(now - datetime.timedelta(days=21))
+#loadDB(now - datetime.timedelta(days=14))
+#loadDB(twomonthago)
+#loadDB(onemonthago)
+loadDB(when)
 print("-------------------- ",datetime.datetime.now())
