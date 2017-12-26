@@ -152,10 +152,11 @@ def mkStat(week):
     out.close()
 
 print("-------------------- ",datetime.datetime.now())
-for i in range(10,0,-1):
-    week = (datetime.date.today() - datetime.timedelta(days=7*i)).isocalendar()[1]
-    mkIndex(week)
+#for i in range(10,0,-1):
+#    week = (datetime.date.today() - datetime.timedelta(days=7*i)).isocalendar()[1]
+#    mkIndex(week)
 week = (datetime.date.today() - datetime.timedelta(days=7)).isocalendar()[1]
+mkIndex(week)
 mkTeams(week)
 mkStat(week)
 print("-------------------- ",datetime.datetime.now())
