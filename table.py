@@ -1,4 +1,4 @@
-#!bin/python
+#!/usr/bin/python3
 
 import sqlite3
 import datetime
@@ -98,6 +98,9 @@ def mkTeams(week):
     outteam.append('                <h1>Команды</h1>')
     outteam.append('            </center>')
     for t in teams:
+        tmileage = 0
+        tgoal = 0
+        tpct = 0
         outteam.append('            <center>')
         outteam.append('                <h2>{}</h2>'.format(t[1]))
         outteam.append('            </center>')
@@ -116,6 +119,11 @@ def mkTeams(week):
                 rgoal = 0
             outteam.append('                 <tr{}><td><a href="http://aerobia.ru/users/{}">{}</a></td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr>'.format(alt, r[0], r[1], rgoal, rmileage, rmileage*100/rgoal))
             odd = not odd
+            tmileage += rmileage
+            tgoal += rgoal
+            tpct += rmileage*100/rgoal
+        print(t, tgoal, tmileage)
+        outteam.append('               <tfoot><tr><td>Всего:</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr></tfoot>'.format(tgoal, tmileage, tpct/len(runners)))
         outteam.append('               </tbody>')
         outteam.append('            </table></div>')
         outteam.append('            <br />')
