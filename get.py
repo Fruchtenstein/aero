@@ -1,4 +1,4 @@
-#!bin/python
+#!/usr/bin/python3
 
 from urllib.request import urlopen,Request
 from bs4 import BeautifulSoup
@@ -7,8 +7,15 @@ import sqlite3
 import os
 import re
 
+def week_range(date):
+    year, week, dow = date.isocalendar()
+    start_date = date - datetime.timedelta(dow-1)
+    end_date = start_date + datetime.timedelta(6)
+    return (datetime.datetime.combine(start_date, datetime.datetime.min.time()), datetime.datetime.combine(end_date, datetime.datetime.max.time()))
+
 def getlog(date):
     datestring = "{:d}-{:02d}-{:02d}".format(date.year, date.month, date.day)
+    week = week_range(date) 
     db = sqlite3.connect('aerobia.db')
     c1 = db.cursor()
     for row in c1.execute('SELECT runnerid from runners').fetchall():
@@ -20,16 +27,16 @@ def getlog(date):
         username = bs.aside.div.div.strong.get_text()
         for w in workouts:
             pars = w.find_all("p")
-            type = w.p.get_text()
+            runtype = w.p.get_text()
             if len(pars) == 3:
-                type = pars[0].get_text()
+                runtype = pars[0].get_text()
                 when = pars[1].get_text()
                 dist = pars[2].get_text()
             elif len(pars) == 4:
-                type = pars[1].get_text()
+                runtype = pars[1].get_text()
                 when = pars[2].get_text()
                 dist = pars[3].get_text()
-            if (type in ["Бег", "Спортивное ориентирование", "Беговая дорожка"]):
+            if (runtype in ["Бег", "Спортивное ориентирование", "Беговая дорожка"]):
                 d = when.split()
                 day = int(d[0])
                 month = months[d[1]]
@@ -46,10 +53,13 @@ def getlog(date):
                 runh = h.group(1) if h else "00"
                 runm = re.search('([0-9]*)м', t).group(1)
                 runs = re.search('([0-9]*)с', t).group(1)
-                runtime = "{}:{}:{}".format(runh,runm,runs)
-                print(">>>>>> ", runnerid, username, rundate, d[0], runtime)
-                c2 = db.cursor()
-                c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?)', (runnerid, rundate, float(d[0]), runtime))
+                runtime = "{:02d}:{:02d}:{:02d}".format(int(runh),int(runm),int(runs))
+                if week[0] < datetime.datetime.strptime(rundate, '%Y-%m-%d %H:%M') < week[1]:
+                    print(">>>>>> ", runnerid, username, rundate, runtype, d[0], runtime)
+                    c2 = db.cursor()
+                    c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?, ?)', (runnerid, rundate, float(d[0]), runtime, runtype))
+                else:
+                    print("------ ",runnerid, username, rundate, runtype, d[0], runtime)
     db.commit()
     db.close()
 
