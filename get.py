@@ -14,15 +14,17 @@ def week_range(date):
     year, week, dow = date.isocalendar()
     start_date = date - datetime.timedelta(dow-1)
     end_date = start_date + datetime.timedelta(6)
-    return (utc.localize(datetime.datetime.combine(start_date, datetime.datetime.min.time())), utc.localize(datetime.datetime.combine(end_date, datetime.datetime.max.time())))
+    return (week, utc.localize(datetime.datetime.combine(start_date, datetime.datetime.min.time())), utc.localize(datetime.datetime.combine(end_date, datetime.datetime.max.time())))
 
 def getlog(date):
     datestring = "{:d}-{:02d}-{:02d}".format(date.year, date.month, date.day)
     week = week_range(date) 
+    print(week)
     db = sqlite3.connect('aerobia.db')
     c1 = db.cursor()
     for row in c1.execute('SELECT runnerid from runners').fetchall():
         runnerid = row[0]
+        weeklytotal = 0
         print("-----fetching http://aerobia.ru/users/{}/workouts?month={}".format(runnerid, datestring))
         html = urlopen(Request("http://aerobia.ru/users/{}/workouts?month={}".format(runnerid, datestring), headers={'User-Agent': 'Mozilla/4.0'}))
         bs = BeautifulSoup(html.read(), "lxml")
@@ -53,12 +55,16 @@ def getlog(date):
                 runm = re.search('([0-9]*)м', t).group(1)
                 runs = re.search('([0-9]*)с', t).group(1)
                 runtime = "{:02d}:{:02d}:{:02d}".format(int(runh),int(runm),int(runs))
-                if week[0] < dateutil.parser.parse(rundate) < week[1]:
+                if week[1] < dateutil.parser.parse(rundate) < week[2]:
                     print("    >>>>>> ", runnerid, username, rundate, runtype, distance, runtime)
+                    weeklytotal += distance
                     c2 = db.cursor()
                     c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?, ?)', (runnerid, rundate, distance, runtime, runtype))
                 else:
                     print("    ------ ",runnerid, username, rundate, runtype, distance, runtime)
+        print("Weekly total: {}".format(weeklytotal))
+        c3 = db.cursor()
+        c3.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?)', (runnerid,  week[0], weeklytotal))
     db.commit()
     db.close()
 
