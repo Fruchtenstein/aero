@@ -2,10 +2,18 @@
 
 import sqlite3
 import datetime
+import pytz
 from string import Template
 
+def week_range(date):
+    utc=pytz.UTC
+    year, week, dow = date.isocalendar()
+    start_date = date - datetime.timedelta(dow-1)
+    end_date = start_date + datetime.timedelta(6)
+    return (week, utc.localize(datetime.datetime.combine(start_date, datetime.datetime.min.time())), utc.localize(datetime.datetime.combine(end_date, datetime.datetime.max.time())))
 
-def mkIndex(week):
+def mkIndex(date):
+    week = date.isocalendar()[1]
     db = sqlite3.connect('aerobia.db')
     c1 = db.cursor()
     teams = c1.execute('SELECT * FROM teams ORDER BY teamid').fetchall()
@@ -126,9 +134,11 @@ def mkIndex(week):
     out = open('html/index.html', 'w')
     out.write(result)
     out.close()
+    db.close()
  
 
-def mkTeams(week):
+def mkTeams(date):
+    week = date.isocalendar()[1]
     db = sqlite3.connect('aerobia.db')
     c1 = db.cursor()
     teams = c1.execute('SELECT * FROM teams ORDER BY teamid').fetchall()
@@ -178,18 +188,33 @@ def mkTeams(week):
     out = open('html/teams.html', 'w')
     out.write(result)
     out.close()
+    db.close()
 
 
-def mkStat(week):
+def mkStat(date):
+    w = week_range(date)
+    week = w[0]
+    db = sqlite3.connect('aerobia.db')
+    c1 = db.cursor()
     outstat = []
     outstat.append('            <br />')
     outstat.append('            <center>')
     outstat.append('                <h1>Лучший бегун {} недели:</h1>'.format(week))
     outstat.append('                <h1>Митя ☮ Фруктенштейн</h1>'.format(week))
-#    outstat.append('                (за все хорошее)'.format(week))
+    outstat.append('                <hr />')
     outstat.append('            </center>')
     outstat.append('')
-    
+
+    winner = c1.execute('SELECT runnerid, MAX(d) FROM (SELECT runnerid, SUM(distance) AS d FROM log WHERE date > ? AND date < ? GROUP BY runnerid)',(w[1], w[2])).fetchone()
+    winnername = c1.execute('SELECT runnername FROM runners WHERE runnerid=?',(winner[0],)).fetchone()
+    outstat.append('            <br />')
+    outstat.append('            <center>')
+    outstat.append('                <h1>Больше всех на {} неделе пробежал:</h1>'.format(week))
+    outstat.append('                <h1>{} — {} км.</h1>'.format(winnername[0], winner[1]))
+    outstat.append('                <hr />')
+    outstat.append('            </center>')
+    outstat.append('')
+
     inp = open('statistics.template')
     tpl = Template(inp.read())
     outstr = '\n'.join(outstat)
@@ -199,11 +224,12 @@ def mkStat(week):
     out = open('html/statistics.html', 'w')
     out.write(result)
     out.close()
+    db.close()
 
 print("-------------------- ",datetime.datetime.now())
-week = (datetime.date.today() - datetime.timedelta(days=7)).isocalendar()[1]
-mkIndex(week)
-mkTeams(week)
-mkStat(week)
+now = datetime.date.today()
+mkIndex(now - datetime.timedelta(days=7))
+mkTeams(now - datetime.timedelta(days=7))
+mkStat(now - datetime.timedelta(days=7))
 print("-------------------- ",datetime.datetime.now())
 
