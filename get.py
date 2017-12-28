@@ -22,8 +22,9 @@ def getlog(date):
     print(week)
     db = sqlite3.connect('aerobia.db')
     c1 = db.cursor()
-    for row in c1.execute('SELECT runnerid from runners').fetchall():
+    for row in c1.execute('SELECT runnerid, isill from runners').fetchall():
         runnerid = row[0]
+        isill = row[1]
         weeklytotal = 0
         print("-----fetching http://aerobia.ru/users/{}/workouts?month={}".format(runnerid, datestring))
         html = urlopen(Request("http://aerobia.ru/users/{}/workouts?month={}".format(runnerid, datestring), headers={'User-Agent': 'Mozilla/4.0'}))
@@ -64,7 +65,17 @@ def getlog(date):
                     print("    ------ ",runnerid, username, rundate, runtype, distance, runtime)
         print("Weekly total: {}".format(weeklytotal))
         c3 = db.cursor()
-        c3.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?)', (runnerid,  week[0], weeklytotal))
+        c3.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid,  week[0], weeklytotal, isill))
+#    c4 = db.cursor()
+#    tbl = []
+#    for row in c4.execute('SELECT teamid, 100*SUM(distance)/(SUM(goal)/52) AS target FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND week=? GROUP BY teamid ORDER BY target DESC',
+#            (week[0],)).fetchall():
+#        tbl.append([row[0], week[0], row[1]])
+#    print(tbl)
+#    for n,t in enumerate(tbl):
+#        pts = len(tbl)*5-n*5-5
+#        print(t[0],t[1],pts,t[2])
+#        c4.execute('INSERT OR REPLACE INTO tlog VALUES (?, ?, ?, ?)', (t[0], t[1], pts, t[2]))
     db.commit()
     db.close()
 

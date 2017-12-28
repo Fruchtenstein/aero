@@ -95,9 +95,9 @@
 
         </td>
         <td>
-            $table
-            <br />
             $table2
+            <br />
+            $table
             <br />
         </td>
       </tr>
