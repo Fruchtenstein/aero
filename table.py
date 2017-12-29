@@ -3,6 +3,7 @@
 import sqlite3
 import datetime
 import pytz
+import os
 from string import Template
 
 def week_range(date):
@@ -40,7 +41,10 @@ def mkIndex(date):
         print(weeklog)
         if weeklog:
             output.append('            <center>')
-            output.append('                <h1>Результаты {} недели</h1>'.format(w))
+            output.append('                <h1>Результаты {0} недели</h1>'.format(w))
+            output.append('                <a href="teams{0:02d}.html">Подробнее</a>'.format(w))
+            output.append('                <br />')
+            output.append('                <br />')
             output.append('            </center>')
             output.append('            <div class="datagrid"><table>')
             output.append('               <thead><tr><th>Команда</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено (%)</th><th>Очки</th><th>Сумма</th></tr></thead>')
@@ -180,11 +184,26 @@ def mkTeams(date):
         outteam.append('               </tbody>')
         outteam.append('            </table></div>')
         outteam.append('            <br />')
-    
+    outteambox=[]
+    outteambox.append('    <nav class="sub">')
+    outteambox.append('      <ul>')
+    for w in range(1,week+1):
+        if w == week:
+#            print("current week")
+            outteambox.append('        <li class="active"><span>{} неделя</span></li>'.format(w))
+        elif os.path.isfile("html/teams{:02d}.html".format(w)):
+#            print("statistics{:02d}.html exists".format(w))
+            outteambox.append('        <li><a href="teams{0:02d}.html">{0} неделя</a></li>'.format(w))
+#        else:
+#            print("statistics{:02d}.html doesn't exist".format(w))
+#            outteambox.append('        <li>{} неделя</li>'.format(w))
+    outteambox.append('      </ul>')
+    outteambox.append('    </nav>')
     inp = open('teams.template')
     tpl = Template(inp.read())
     outstr = '\n'.join(outteam)
-    subst = {'table':outstr, 'week':str(week).zfill(2)}
+    outbox = '\n'.join(outteambox)
+    subst = {'box':outbox, 'table':outstr, 'week':str(week).zfill(2)}
     result = tpl.substitute(subst)
     inp.close()
     out = open('html/teams{:02d}.html'.format(week), 'w')
@@ -217,10 +236,26 @@ def mkStat(date):
     outstat.append('            </center>')
     outstat.append('')
 
+    outstatbox=[]
+    outstatbox.append('    <nav class="sub">')
+    outstatbox.append('      <ul>')
+    for w in range(1,week+1):
+        if w == week:
+#            print("current week")
+            outstatbox.append('        <li class="active"><span>{} неделя</span></li>'.format(w))
+        elif os.path.isfile("html/statistics{:02d}.html".format(w)):
+#            print("statistics{:02d}.html exists".format(w))
+            outstatbox.append('        <li><a href="statistics{0:02d}.html">{0} неделя</a></li>'.format(w))
+#        else:
+#            print("statistics{:02d}.html doesn't exist".format(w))
+#            outstatbox.append('        <li>{} неделя</li>'.format(w))
+    outstatbox.append('      </ul>')
+    outstatbox.append('    </nav>')
     inp = open('statistics.template')
     tpl = Template(inp.read())
     outstr = '\n'.join(outstat)
-    subst = {'data':outstr, 'week':str(week).zfill(2)}
+    outbox = '\n'.join(outstatbox)
+    subst = {'box':outbox, 'data':outstr, 'week':str(week).zfill(2)}
     result = tpl.substitute(subst)
     inp.close()
     out = open('html/statistics{:02d}.html'.format(week), 'w')
