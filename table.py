@@ -128,7 +128,7 @@ def mkIndex(date):
     tpl = Template(inp.read())
     outstr = '\n'.join(output)
     outstr2 = '\n'.join(output2)
-    subst = {'table':outstr, 'table2':outstr2}
+    subst = {'table':outstr, 'table2':outstr2, 'week':str(week).zfill(2)}
     result = tpl.substitute(subst)
     inp.close()
     out = open('html/index.html', 'w')
@@ -156,25 +156,27 @@ def mkTeams(date):
         outteam.append('                <h2>{}</h2>'.format(t[1]))
         outteam.append('            </center>')
         outteam.append('            <div class="datagrid"><table>')
-        outteam.append('               <thead><tr><th>Имя</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено (%)</th></tr></thead>')
+        outteam.append('               <thead><tr><th>Имя</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено (%)</th><th>На больничном</th></tr></thead>')
         outteam.append('               <tbody>')
         runners = c1.execute('SELECT * FROM runners WHERE teamid=? ORDER BY runnername', (t[0],)).fetchall()
         odd = True
         for r in runners:
-            alt = ' class="alt"' if odd else ''
-            if r[4]==0:
-                rmileage = c1.execute('SELECT distance FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()[0]
-                rgoal = r[3]/52
+            rdata = c1.execute('SELECT distance,wasill FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()
+            rmileage = rdata[0]
+            rgoal = r[3]/52
+            if rdata[1]==0:
+                alt = ' class="alt"' if odd else ''
+                tmileage += rmileage
+                tgoal += rgoal
+                tpct += rmileage*100/rgoal
+                ill = ""
             else:
-                rmileage = 0
-                rgoal = 0
-            outteam.append('                 <tr{}><td><a href="http://aerobia.ru/users/{}">{}</a></td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr>'.format(alt, r[0], r[1], rgoal, rmileage, rmileage*100/rgoal))
+                alt = ' class="alt ill"' if odd else ''
+                ill = "ДА"
+            outteam.append('                 <tr{}><td><a href="http://aerobia.ru/users/{}">{}</a></td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{}</td></tr>'.format(alt, r[0], r[1], rgoal, rmileage, rmileage*100/rgoal, ill))
             odd = not odd
-            tmileage += rmileage
-            tgoal += rgoal
-            tpct += rmileage*100/rgoal
         print(t, tgoal, tmileage)
-        outteam.append('               <tfoot><tr><td>Всего:</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr></tfoot>'.format(tgoal, tmileage, tpct/len(runners)))
+        outteam.append('               <tfoot><tr><td>Всего:</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td><td></td></tr></tfoot>'.format(tgoal, tmileage, tpct/len(runners)))
         outteam.append('               </tbody>')
         outteam.append('            </table></div>')
         outteam.append('            <br />')
@@ -182,10 +184,10 @@ def mkTeams(date):
     inp = open('teams.template')
     tpl = Template(inp.read())
     outstr = '\n'.join(outteam)
-    subst = {'table':outstr}
+    subst = {'table':outstr, 'week':str(week).zfill(2)}
     result = tpl.substitute(subst)
     inp.close()
-    out = open('html/teams.html', 'w')
+    out = open('html/teams{:02d}.html'.format(week), 'w')
     out.write(result)
     out.close()
     db.close()
@@ -218,10 +220,10 @@ def mkStat(date):
     inp = open('statistics.template')
     tpl = Template(inp.read())
     outstr = '\n'.join(outstat)
-    subst = {'data':outstr}
+    subst = {'data':outstr, 'week':str(week).zfill(2)}
     result = tpl.substitute(subst)
     inp.close()
-    out = open('html/statistics.html', 'w')
+    out = open('html/statistics{:02d}.html'.format(week), 'w')
     out.write(result)
     out.close()
     db.close()
