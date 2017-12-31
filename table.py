@@ -226,7 +226,7 @@ def mkStat(date):
     outstat.append('            </center>')
     outstat.append('')
 
-    winner = c1.execute('SELECT runnerid, MAX(d) FROM (SELECT runnerid, SUM(distance) AS d FROM log WHERE date > ? AND date < ? GROUP BY runnerid)',(w[1], w[2])).fetchone()
+    winner = c1.execute('SELECT runnerid, MAX(d) FROM (SELECT runnerid, SUM(distance) AS d FROM log WHERE date > ? AND date < ? GROUP BY runnerid)',(w[1].isoformat(), w[2].isoformat())).fetchone()
     winnername = c1.execute('SELECT runnername FROM runners WHERE runnerid=?',(winner[0],)).fetchone()
     outstat.append('            <br />')
     outstat.append('            <center>')
@@ -236,8 +236,10 @@ def mkStat(date):
     outstat.append('            </center>')
     outstat.append('')
 
-    winner = c1.execute('SELECT runnerid, MAX(pct) FROM (SELECT log.runnerid, 100*SUM(distance)/(goal/52) AS pct FROM log,runners WHERE date > ? AND date < ? AND log.runnerid=runners.runnerid GROUP BY log.runnerid)',(w[1], w[2])).fetchone()
+    winner = c1.execute('SELECT runnerid, MAX(pct) FROM (SELECT log.runnerid, 100*SUM(distance)/(goal/52) AS pct FROM log,runners WHERE date > ? AND date < ? AND log.runnerid=runners.runnerid GROUP BY log.runnerid)',(w[1].isoformat(), w[2].isoformat())).fetchone()
+    print(w[1], w[2], winner)
     winnername = c1.execute('SELECT runnername FROM runners WHERE runnerid=?',(winner[0],)).fetchone()
+    print(winnername)
     outstat.append('            <br />')
     outstat.append('            <center>')
     outstat.append('                <h1>Максимальное выполнение плана:</h1>')
