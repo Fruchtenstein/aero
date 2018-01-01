@@ -146,7 +146,7 @@ def mkIndex(date):
             if d:
                 tmileage += d
 #        tbl.append([t[1], tmileage, tgoal])
-        output.append('                <tr><td>{}</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr>'.format(t[1], tmileage, tgoal/52, 100*tmileage*52/tgoal))
+        output.append('                <tr><td>{}</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr>'.format(t[1], tgoal/52, tmileage, 100*tmileage*52/tgoal))
     inp = open('index.template')
     tpl = Template(inp.read())
     outstr = '\n'.join(output)
