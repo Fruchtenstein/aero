@@ -60,47 +60,6 @@ def mkIndex(date):
             output.append('            </table></div>')
             output.append('            <br />')
             output.append('            <hr />')
-#    tbl = []
-#    for t in teams:
-#        tgoal = c1.execute('SELECT coalesce(sum(goal),0) FROM runners WHERE teamid=? AND isill=0', (t[0],)).fetchone()[0]/52
-#        runners = c1.execute('SELECT runnerid FROM runners WHERE teamid=? AND isill=0', (t[0],)).fetchall()
-#        tmileage = 0
-#        tpercentage = 0
-#        for r in runners:
-#            rmileage = c1.execute('SELECT coalesce(sum(distance),0) FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()[0]
-#            rgoal = c1.execute('SELECT goal FROM runners WHERE runnerid=? AND isill=0', (r[0],)).fetchone()[0]/52
-#            print(r[0], week, rmileage, rgoal)
-#            print("{}: {:.2f} {:.2f} {:.2f}".format(r[0], rmileage, rgoal, rmileage*100/rgoal))
-#            tmileage += rmileage
-#            tpercentage += rmileage*100/rgoal
-#        tpercentage = tpercentage/len(runners)
-#        print("==== Team ", t[1])
-#        print(".... tgoal:   ", tgoal)
-#        print(".... tmileage:", tmileage)
-#        print(".... sum pct: ", tmileage*100/tgoal)
-#        print(".... avg pct: ", tpercentage)
-#        tbl.append([t[0], t[1], tgoal, tmileage, tmileage*100/tgoal, tpercentage])
-#    
-#    tbl = sorted(tbl, key=lambda x: x[5], reverse = True)
-#    output = []
-#    output.append('            <center>')
-#    output.append('                <h1>Результаты {} недели</h1>'.format(week))
-#    output.append('            </center>')
-#    
-#    output.append('            <div class="datagrid"><table>')
-#    output.append('               <thead><tr><th>Команда</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено (%)</th><th>Очки</th></tr></thead>')
-#    output.append('               <tbody>')
-#    odd = True
-#    for n, t in enumerate(tbl):
-#        alt = ' class="alt"' if odd else ''
-#        pts = len(teams)*5-n*5-5
-#        output.append('                 <tr{}><td>{}</td><td>{:.2f}</td><td>{:.2f}</td><td>{:.2f}</td><td>{}</td></tr>'.format(alt, t[1], t[2], t[3], t[5], pts))
-##        c1.execute('INSERT OR REPLACE INTO tlog VALUES (?, ?, ?, ?)', (t[0], week, pts, t[5]))
-#        odd = not odd
-#    output.append('               </tbody>')
-#    output.append('            </table></div>')
-#    
-#    db.commit()
     
     output2 = []
     output2.append('            <br />')
@@ -129,24 +88,33 @@ def mkIndex(date):
     output2.append('            <hr />')
             
     output.append('            <center>')
-    output.append('                <h1>Результаты текущей недели</h1>'.format(w))
+    output.append('                <h1>Промежуточные результаты текущей недели</h1>'.format(w))
     output.append('            </center>')
     output.append('            <div class="datagrid"><table>')
     output.append('               <thead><tr><th>Команда</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено (%)</th></tr></thead>')
     output.append('               <tbody>')
-    odd = True
-    w = week_range(datetime.datetime.now())
-#    tbl = []
+    curweek = week_range(datetime.datetime.now())
+    tbl = []
     for t in teams:
         tmileage = 0
         tgoal = 0
         for (r,g) in c1.execute('SELECT runnerid,goal FROM runners WHERE teamid = ?', (t[0],)).fetchall():
             tgoal += g
-            (d,) = c2.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date > ?', (r, w[1].isoformat())).fetchone()
+            (d,) = c2.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date > ?', (r, curweek[1].isoformat())).fetchone()
+            if t[0]==1:
+                print(curweek[1].isoformat(),r,g,d)
             if d:
+                if t[0]==1:
+                    print("added")
                 tmileage += d
-#        tbl.append([t[1], tmileage, tgoal])
-        output.append('                    <tr><td>{}</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr>'.format(t[1], tgoal/52, tmileage, 100*tmileage*52/tgoal))
+        tbl.append([t[1], tgoal, tmileage])
+    print(tbl)
+    tbl = sorted(tbl, key=lambda x: x[1]/x[2], reverse = False)
+    odd = True
+    for team in tbl:
+        alt = ' class="alt"' if odd else ''
+        output.append('                    <tr{}><td>{}</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr>'.format(alt, team[0], team[1]/52, team[2], 100*team[2]*52/team[1]))
+        odd = not odd
     output.append('                </tbody>')
     output.append('             </table>')
     output.append('           </div>')
