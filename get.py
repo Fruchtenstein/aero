@@ -30,37 +30,40 @@ def parseuser(db, runnerid, isill, date, session):
     workouts = root.findall('.//r')
     c2 = db.cursor()
     for w in workouts:
+        print("  ---- workout:", w.attrib['id'], runnerid, w.attrib['start_at'])
         if w.attrib['sport'] in ["Бег", "Спортивное ориентирование", "Беговая дорожка"]:
-            print("  ----:", w.attrib['id'], runnerid, w.attrib['start_at'])
+            print("    ==== run:", w.attrib['distance'], " km, ", w.attrib['duration'])
             c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?, ?, ?)', (w.attrib['id'], runnerid, w.attrib['start_at'], w.attrib['distance'], w.attrib['duration'], w.attrib['sport']))
 
-def getlog(date):
-    with open('credentials') as f:
-            credentials = f.read().splitlines()
-    weekago = date - datetime.timedelta(days=7)
-    thisweek = week_range(date) 
-    lastweek = week_range(weekago)
-    loginurl="http://aerobia.ru/users/sign_in"
-    data = {"user[email]": credentials[0], "user[password]": credentials[1]}
-    s = requests.session()
-    s.headers.update({'User-Agent':'Mozilla/4.0'})
-    print("log in")
-    r = s.post(loginurl,data)
-    db = sqlite3.connect('aerobia.db')
-    c1 = db.cursor()
-    runners = c1.execute('SELECT runnerid, isill from runners').fetchall()
-    for r in runners:
-        print(r)
-        runnerid = r[0]
-        isill = r[1]
-#        parseuser(db, runnerid, isill, weekago)
-        parseuser(db, runnerid, isill, date, s)
-    db.commit()
-    db.close()
 
+print("-------------------- ",datetime.datetime.now())
 now = datetime.date.today()
 months = {'янв.':1,'фев.':2,'мар.':3,'апр.':4,'мая':5,'июня':6,'июля':7,'авг.':8,'сент.':9,'окт.':10,'нояб.':11,'дек.':12}
 invmonths = {v: k for k, v in months.items()}
-print("-------------------- ",datetime.datetime.now())
-getlog(now)
+with open('credentials') as f:
+        credentials = f.read().splitlines()
+weekago = now - datetime.timedelta(days=7)
+thisweek = week_range(now) 
+lastweek = week_range(weekago)
+loginurl="http://aerobia.ru/users/sign_in"
+data = {"user[email]": credentials[0], "user[password]": credentials[1]}
+s = requests.session()
+s.headers.update({'User-Agent':'Mozilla/4.0'})
+print("log in")
+r = s.post(loginurl,data)
+db = sqlite3.connect('aerobia.db')
+c1 = db.cursor()
+runners = c1.execute('SELECT runnerid, isill from runners').fetchall()
+for r in runners:
+    print("**** Runner:", r)
+    runnerid = r[0]
+    isill = r[1]
+#    parseuser(db, runnerid, isill, weekago, s)
+    parseuser(db, runnerid, isill, now, s)
+    lastweekresult = c1.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1], lastweek[2])).fetchone()[0]
+    thisweekresult = c1.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1], thisweek[2])).fetchone()[0]
+    c1.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, isill))
+    c1.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, thisweek[0], thisweekresult, isill))
+db.commit()
+db.close()
 print("-------------------- ",datetime.datetime.now())
