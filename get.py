@@ -18,11 +18,17 @@ def week_range(date):
     end_date = start_date + datetime.timedelta(6)
     return (week, utc.localize(datetime.datetime.combine(start_date, datetime.datetime.min.time())), utc.localize(datetime.datetime.combine(end_date, datetime.datetime.max.time())))
 
-def datestring(date):
-    return "{:d}-{:02d}-{:02d}".format(date.year, date.month, date.day)
-
-def parseuser(db, runnerid, isill, date, session):
+def parseuser(db, runnerid, date, session):
     dataurl = "http://aerobia.ru/api/users/{}/calendar/{}/{:02d}".format(runnerid, date.year, date.month)
+    getdata(db, runnerid, date, session, dataurl)
+    weekrange = week_range(date)
+    if weekrange[1].month < weekrange[2].month:
+        dataurl = "http://aerobia.ru/api/users/{}/calendar/{}/{:02d}".format(runnerid, weekrange[1].year, weekrange[1].month)
+        getdata(db, runnerid, date, session, dataurl)
+
+
+def getdata(db, runnerid, date, session, dataurl):
+    weekrange = week_range(date)
     print("requesting "+dataurl)
     r = session.get(dataurl)
     xml = r.content
@@ -33,7 +39,10 @@ def parseuser(db, runnerid, isill, date, session):
         print("  ---- workout:", w.attrib['id'], runnerid, w.attrib['start_at'])
         if w.attrib['sport'] in ["Бег", "Спортивное ориентирование", "Беговая дорожка"]:
             print("    ==== run:", w.attrib['distance'], " km, ", w.attrib['duration'])
-            c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?, ?, ?)', (w.attrib['id'], runnerid, w.attrib['start_at'], w.attrib['distance'], w.attrib['duration'], w.attrib['sport']))
+            rundate = dateutil.parser.parse(w.attrib['start_at'])
+            if rundate >= weekrange[1] and rundate <= weekrange[2]:
+                print("      >>>> valid date: ", rundate)
+                c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?, ?, ?)', (w.attrib['id'], runnerid, w.attrib['start_at'], w.attrib['distance'], w.attrib['duration'], w.attrib['sport']))
 
 
 print("-------------------- ",datetime.datetime.now())
@@ -43,6 +52,7 @@ invmonths = {v: k for k, v in months.items()}
 with open('credentials') as f:
         credentials = f.read().splitlines()
 weekago = now - datetime.timedelta(days=7)
+monthago = now.replace(day=1) - datetime.timedelta(days=1)
 thisweek = week_range(now) 
 lastweek = week_range(weekago)
 loginurl="http://aerobia.ru/users/sign_in"
@@ -58,12 +68,17 @@ for r in runners:
     print("**** Runner:", r)
     runnerid = r[0]
     isill = r[1]
-#    parseuser(db, runnerid, isill, weekago, s)
-    parseuser(db, runnerid, isill, now, s)
-    lastweekresult = c1.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1], lastweek[2])).fetchone()[0]
-    thisweekresult = c1.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1], thisweek[2])).fetchone()[0]
-    c1.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, isill))
+    print(" #### retrieve this week")
+    parseuser(db, runnerid, now, s)
+    thisweekresult = c1.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1].isoformat(), thisweek[2].isoformat())).fetchone()[0]
+    print(" #### this week result: ", thisweek[1], thisweek[2], thisweekresult)
     c1.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, thisweek[0], thisweekresult, isill))
+    if now.weekday() < 3:
+        print(" #### retrieve last week")
+        parseuser(db, runnerid, weekago, s)
+        lastweekresult = c1.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1].isoformat(), lastweek[2].isoformat())).fetchone()[0]
+        print(" #### last week result: ", lastweek[1], lastweek[2], lastweekresult)
+        c1.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, isill))
 db.commit()
 db.close()
 print("-------------------- ",datetime.datetime.now())
