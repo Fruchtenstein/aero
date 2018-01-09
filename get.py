@@ -35,6 +35,7 @@ def getdata(db, runnerid, date, session, dataurl):
     root = lxml.etree.fromstring(xml)
     workouts = root.findall('.//r')
     c2 = db.cursor()
+    c2.execute("DELETE FROM log WHERE runnerid=? AND date>? AND date<?", (runnerid, weekrange[1].isoformat(), weekrange[2].isoformat()))
     for w in workouts:
         print("  ---- workout:", w.attrib['id'], runnerid, w.attrib['start_at'])
         if w.attrib['sport'] in ["Бег", "Спортивное ориентирование", "Беговая дорожка"]:
@@ -77,7 +78,7 @@ for r in runners:
         print(" #### retrieve last week")
         parseuser(db, runnerid, weekago, s)
         lastweekresult = c1.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1].isoformat(), lastweek[2].isoformat())).fetchone()[0]
-        print(" #### last week result: ", lastweek[1], lastweek[2], lastweekresult)
+        print(" #### last week result: ", lastweek[1], lastweek[2], lastweekresult, lastweek[1].isoformat(), lastweek[2].isoformat())
         c1.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, isill))
 db.commit()
 db.close()

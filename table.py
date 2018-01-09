@@ -109,7 +109,9 @@ def printstandings(teams, teampoints):
     return output
 
 def mkIndex(date):
-    dolastweek = date.weekday() < 3
+    dolastweek = date.weekday() < 2
+    print("date: ", date, "; weekday: ", date.weekday())
+    print("do last week = ", dolastweek)
     if dolastweek:
         week = date.isocalendar()[1] - 2
     else:
@@ -124,9 +126,10 @@ def mkIndex(date):
         teampoints.append(0)
     for w in range(1,week+1):
         oneweeklog = []
-        for row in c1.execute('SELECT teamid, 100*SUM(distance)/(SUM(goal)/52) AS percentage, SUM(distance), SUM(goal)/52 FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND week=? AND wlog.wasill=0 GROUP BY teamid ORDER BY percentage DESC',
+        for row in c1.execute('SELECT teamid, SUM(100*distance/(goal/52))/COUNT(*) AS percentage, SUM(distance), SUM(goal)/52 FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND week=? AND wlog.wasill=0 GROUP BY teamid ORDER BY percentage DESC',
                 (w,)).fetchall():
             oneweeklog.append([w, row[0], row[1], row[2], row[3]])
+            print("   ******", [w, row])
         for n,t in enumerate(oneweeklog):
             pts = len(oneweeklog)*5-n*5-5
             teampoints[t[1]-1] += pts
@@ -237,7 +240,7 @@ def mkTeams(date):
 
 
 def mkStat(date):
-    dolastweek = date.weekday() < 3
+    dolastweek = date.weekday() < 2
     for weeksago in range(0, date.isocalendar()[1]):
         dodate = date - datetime.timedelta(days=7*weeksago)
         w = week_range(dodate)
