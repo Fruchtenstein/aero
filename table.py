@@ -189,10 +189,9 @@ def mkTeams(date):
             numberofrunners = len(runners)
             odd = True
             for r in runners:
-                rdata = c1.execute('SELECT distance,wasill FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()
-                if not rdata:
-                    rdata = (0,0)
-                rmileage = rdata[0] or 0
+                rdata = c1.execute('SELECT COALESCE(distance,0),wasill FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()
+                print(" ////////// ", r[0], week, rdata)
+                rmileage = rdata[0] 
                 rgoal = r[3]/52
                 if rdata[1]==0:
                     alt = ' class="alt"' if odd else ''
