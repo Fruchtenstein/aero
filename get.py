@@ -68,7 +68,8 @@ runners = c1.execute('SELECT runnerid, isill from runners').fetchall()
 for r in runners:
     print("**** Runner:", r)
     runnerid = r[0]
-    isill = r[1]
+#    isill = r[1]
+    isill = c1.execute('SELECT wasill FROM wlog WHERE runnerid=? ORDER BY week DESC LIMIT 1', (runnerid,)).fetchone()[0]
     print(" #### retrieve this week")
     parseuser(db, runnerid, now, s)
     thisweekresult = c1.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1].isoformat(), thisweek[2].isoformat())).fetchone()[0]
