@@ -54,19 +54,23 @@ def printintermediateresults(date, teams, db):
         tmileage = 0
         tgoal = 0
         tpct = 0
-        runners = c1.execute('SELECT runnerid,goal FROM runners WHERE teamid = ? AND isill=0', (t[0],)).fetchall()
+        runners = c1.execute('SELECT runnerid,goal FROM runners WHERE teamid = ?', (t[0],)).fetchall()
+        illcount = 0
         for (r,g) in runners:
             tgoal += g
-            (d,) = c2.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date > ? AND date < ?', (r, weekrange[1].isoformat(), weekrange[2].isoformat())).fetchone()
-            if d:
-                print("   +++ ", r, d, g/52, 100*52*d/g)
-                tmileage += d
-                tpct += 100*52*d/g
+            d = c2.execute('SELECT COALESCE(distance,0),wasill FROM wlog WHERE runnerid=? AND week=?', (r, weekrange[0])).fetchone()
+#            (d,) = c2.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date > ? AND date < ? AND isill=0', (r, weekrange[1].isoformat(), weekrange[2].isoformat())).fetchone()
+            if d and not d[1]:
+                print("   +++ ", r, d[0], g/52, 100*52*d[0]/g)
+                tmileage += d[0]
+                tpct += 100*52*d[0]/g
                 print("tpct:", tpct)
             else:
                 print("   --- ", r, 0, g/52, 0)
-        tbl.append([t[1], tgoal, tmileage, tpct/len(runners)])
-        print("   ==== team ", [t[1], tgoal, tmileage, tpct/len(runners)])
+            if d[1]:
+                illcount += 1
+        tbl.append([t[1], tgoal, tmileage, tpct/(len(runners)-illcount)])
+        print("   ==== team ", [t[1], tgoal, tmileage, tpct/(len(runners)-illcount)])
     print(tbl)
     tbl = sorted(tbl, key=lambda x: x[3], reverse = True)
     odd = True
