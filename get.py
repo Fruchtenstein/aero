@@ -77,10 +77,11 @@ for r in runners:
     c1.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, thisweek[0], thisweekresult, isill))
     if now.weekday() < 3:
         print(" #### retrieve last week")
+        wasill = c1.execute('SELECT wasill FROM wlog WHERE runnerid=? AND week=?', (runnerid, lastweek[0])).fetchone()[0]
         parseuser(db, runnerid, weekago, s)
         lastweekresult = c1.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1].isoformat(), lastweek[2].isoformat())).fetchone()[0]
         print(" #### last week result: ", lastweek[1], lastweek[2], lastweekresult, lastweek[1].isoformat(), lastweek[2].isoformat())
-        c1.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, isill))
+        c1.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, wasill))
 db.commit()
 db.close()
 print("-------------------- ",datetime.datetime.now())
