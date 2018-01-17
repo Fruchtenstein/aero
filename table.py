@@ -317,6 +317,17 @@ def mkStat(date):
         out.close()
         db.close()
 
+def mkRules(now):
+        inp = open('rules.template')
+        tpl = Template(inp.read())
+        subst = {'week':str(now.isocalendar()[1]).zfill(2)}
+        result = tpl.substitute(subst)
+        inp.close()
+        out = open('html/rules.html', 'w')
+        out.write(result)
+        out.close()
+
+
 print("-------------------- ",datetime.datetime.now())
 now = datetime.date.today()
 #mkIndex(now - datetime.timedelta(days=7))
@@ -325,5 +336,6 @@ now = datetime.date.today()
 mkIndex(now)
 mkTeams(now)
 mkStat(now)
+mkRules(now)
 print("-------------------- ",datetime.datetime.now())
 

@@ -30,6 +30,7 @@
                 <!-- li class="users"><a href="workouts.html"><span></span>Тренировки</a></li -->
                 <li class="friends active"><a href="teams$week.html"><span></span>Команды</a></li>
                 <li class="statistics"><a href="statistics$week.html"><span></span>Статистика</a></li>
+                <li class="bests"><a href="rules.html"><span></span>Правила</a></li>
             </ul>
         </nav>
       </div>
