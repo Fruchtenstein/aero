@@ -38,7 +38,7 @@ def printfinalresults(w, weeklog, teams):
     return output
 
 def printintermediateresults(date, teams, db):
-    print("====== Intermediate:", date)
+    print("====== Intermediate:", date.isocalendar()[1])
     c1 = db.cursor()
     c2 = db.cursor()
     output = []
@@ -57,11 +57,11 @@ def printintermediateresults(date, teams, db):
         runners = c1.execute('SELECT runnerid,goal FROM runners WHERE teamid = ?', (t[0],)).fetchall()
         illcount = 0
         for (r,g) in runners:
-            tgoal += g
             d = c2.execute('SELECT COALESCE(distance,0),wasill FROM wlog WHERE runnerid=? AND week=?', (r, weekrange[0])).fetchone()
 #            (d,) = c2.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date > ? AND date < ? AND isill=0', (r, weekrange[1].isoformat(), weekrange[2].isoformat())).fetchone()
             if d and not d[1]:
                 print("   +++ ", r, d[0], g/52, 100*52*d[0]/g)
+                tgoal += g
                 tmileage += d[0]
                 tpct += 100*52*d[0]/g
                 print("tpct:", tpct)
