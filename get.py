@@ -18,32 +18,37 @@ def week_range(date):
     end_date = start_date + datetime.timedelta(6)
     return (week, utc.localize(datetime.datetime.combine(start_date, datetime.datetime.min.time())), utc.localize(datetime.datetime.combine(end_date, datetime.datetime.max.time())))
 
-def parseuser(db, runnerid, date, session):
-    dataurl = "http://aerobia.ru/api/users/{}/calendar/{}/{:02d}".format(runnerid, date.year, date.month)
-    getdata(db, runnerid, date, session, dataurl)
+def parseuser(runnerid, date, session):
     weekrange = week_range(date)
+    dataurl = "http://aerobia.ru/api/users/{}/calendar/{}/{:02d}".format(runnerid, weekrange[2].year, weekrange[2].month)
+    getdata(runnerid, date, session, dataurl)
     if weekrange[1].month < weekrange[2].month:
         dataurl = "http://aerobia.ru/api/users/{}/calendar/{}/{:02d}".format(runnerid, weekrange[1].year, weekrange[1].month)
-        getdata(db, runnerid, date, session, dataurl)
+        getdata(runnerid, date, session, dataurl)
 
 
-def getdata(db, runnerid, date, session, dataurl):
+def getdata(runnerid, date, session, dataurl):
     weekrange = week_range(date)
     print("requesting "+dataurl)
     r = session.get(dataurl)
     xml = r.content
     root = lxml.etree.fromstring(xml)
     workouts = root.findall('.//r')
-    c2 = db.cursor()
-    c2.execute("DELETE FROM log WHERE runnerid=? AND date>? AND date<?", (runnerid, weekrange[1].isoformat(), weekrange[2].isoformat()))
+    #c2.execute("DELETE FROM log WHERE runnerid=? AND date>? AND date<?", (runnerid, weekrange[1].isoformat(), weekrange[2].isoformat()))
     for w in workouts:
         print("  ---- workout:", w.attrib['id'], runnerid, w.attrib['start_at'])
         if w.attrib['sport'] in ["Бег", "Спортивное ориентирование", "Беговая дорожка"]:
-            print("    ==== run:", w.attrib['distance'], " km, ", w.attrib['duration'])
+            print("    ==== run:", w.attrib['distance'], " km, ", w.attrib['duration'], weekrange)
             rundate = dateutil.parser.parse(w.attrib['start_at'])
             if rundate >= weekrange[1] and rundate <= weekrange[2]:
                 print("      >>>> valid date: ", rundate)
+                print(w.attrib['id'], runnerid, w.attrib['start_at'], w.attrib['distance'], w.attrib['duration'], w.attrib['sport'])
+                db = sqlite3.connect('aerobia.db')
+                c2 = db.cursor()
                 c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?, ?, ?)', (w.attrib['id'], runnerid, w.attrib['start_at'], w.attrib['distance'], w.attrib['duration'], w.attrib['sport']))
+                db.commit()
+                db.close()
+                print("      <<<< committed")
 
 
 print("-------------------- ",datetime.datetime.now())
@@ -65,23 +70,30 @@ r = s.post(loginurl,data)
 db = sqlite3.connect('aerobia.db')
 c1 = db.cursor()
 runners = c1.execute('SELECT runnerid, isill from runners').fetchall()
+db.close()
 for r in runners:
     print("**** Runner:", r)
     runnerid = r[0]
 #    isill = r[1]
-    isill = c1.execute('SELECT wasill FROM wlog WHERE runnerid=? ORDER BY week DESC LIMIT 1', (runnerid,)).fetchone()[0]
+    db = sqlite3.connect('aerobia.db')
+    ill = db.execute('SELECT wasill FROM wlog WHERE runnerid=? ORDER BY week DESC LIMIT 1', (runnerid,)).fetchone()
+    isill = ill[0] if ill else 0
     print(" #### retrieve this week")
-    parseuser(db, runnerid, now, s)
-    thisweekresult = c1.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1].isoformat(), thisweek[2].isoformat())).fetchone()[0]
+    parseuser(runnerid, now, s)
+    thisweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1].isoformat(), thisweek[2].isoformat())).fetchone()[0]
     print(" #### this week result: ", thisweek[1], thisweek[2], thisweekresult)
-    c1.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, thisweek[0], thisweekresult, isill))
+    db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, thisweek[0], thisweekresult, isill))
+    db.commit()
     if now.weekday() < 3:
         print(" #### retrieve last week")
-        wasill = c1.execute('SELECT wasill FROM wlog WHERE runnerid=? AND week=?', (runnerid, lastweek[0])).fetchone()[0]
-        parseuser(db, runnerid, weekago, s)
-        lastweekresult = c1.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1].isoformat(), lastweek[2].isoformat())).fetchone()[0]
+        ill = db.execute('SELECT wasill FROM wlog WHERE runnerid=? AND week=?', (runnerid, lastweek[0])).fetchone()
+        wasill = ill[0] if ill else 0
+        parseuser(runnerid, weekago, s)
+        lastweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1].isoformat(), lastweek[2].isoformat())).fetchone()[0]
         print(" #### last week result: ", lastweek[1], lastweek[2], lastweekresult, lastweek[1].isoformat(), lastweek[2].isoformat())
-        c1.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, wasill))
-db.commit()
-db.close()
+        db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, wasill))
+        db.commit()
+    db.close()
+#db.commit()
+#db.close()
 print("-------------------- ",datetime.datetime.now())

@@ -67,7 +67,7 @@ def printintermediateresults(date, teams, db):
                 print("tpct:", tpct)
             else:
                 print("   --- ", r, 0, g/52, 0)
-            if d[1]:
+            if d and d[1]:
                 illcount += 1
         tbl.append([t[1], tgoal, tmileage, tpct/(len(runners)-illcount)])
         print("   ==== team ", [t[1], tgoal, tmileage, tpct/(len(runners)-illcount)])
@@ -195,9 +195,10 @@ def mkTeams(date):
             for r in runners:
                 rdata = c1.execute('SELECT COALESCE(distance,0),wasill FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()
                 print(" ////////// ", r[0], week, rdata)
-                rmileage = rdata[0] 
+                rmileage = rdata[0] if rdata else 0
+                wasill = rdata[1] if rdata else 0
                 rgoal = r[3]/52
-                if rdata[1]==0:
+                if wasill==0:
                     alt = ' class="alt"' if odd else ''
                     tmileage += rmileage
                     tgoal += rgoal
@@ -256,7 +257,7 @@ def mkStat(date):
         outstat.append('            <center>')
         outstat.append('                <h1>Лучший бегун {} недели:</h1>'.format(week))
         outstat.append('                <h1>Митя ☮ Фруктенштейн</h1>')
-        outstat.append('                <h2>(самый остроумный)</h2>')
+        outstat.append('                <h2>(за то, что выздоровел!)</h2>')
         outstat.append('                <hr />')
         outstat.append('            </center>')
         outstat.append('')
