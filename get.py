@@ -38,17 +38,15 @@ def getdata(runnerid, date, session, dataurl):
     for w in workouts:
         print("  ---- workout:", w.attrib['id'], runnerid, w.attrib['start_at'])
         if w.attrib['sport'] in ["Бег", "Спортивное ориентирование", "Беговая дорожка"]:
-            print("    ==== run:", w.attrib['distance'], " km, ", w.attrib['duration'], weekrange)
+            print("    ==== run:", w.attrib['distance'], " km, ", w.attrib['duration'])
             rundate = dateutil.parser.parse(w.attrib['start_at'])
             if rundate >= weekrange[1] and rundate <= weekrange[2]:
                 print("      >>>> valid date: ", rundate)
-                print(w.attrib['id'], runnerid, w.attrib['start_at'], w.attrib['distance'], w.attrib['duration'], w.attrib['sport'])
                 db = sqlite3.connect('aerobia.db')
                 c2 = db.cursor()
                 c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?, ?, ?)', (w.attrib['id'], runnerid, w.attrib['start_at'], w.attrib['distance'], w.attrib['duration'], w.attrib['sport']))
                 db.commit()
                 db.close()
-                print("      <<<< committed")
 
 
 print("-------------------- ",datetime.datetime.now())
@@ -81,7 +79,7 @@ for r in runners:
     print(" #### retrieve this week")
     parseuser(runnerid, now, s)
     thisweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1].isoformat(), thisweek[2].isoformat())).fetchone()[0]
-    print(" #### this week result: ", thisweek[1], thisweek[2], thisweekresult)
+    print(" #### this week result: ", thisweekresult)
     db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, thisweek[0], thisweekresult, isill))
     db.commit()
     if now.weekday() < 2:
@@ -90,7 +88,7 @@ for r in runners:
         wasill = ill[0] if ill else 0
         parseuser(runnerid, weekago, s)
         lastweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1].isoformat(), lastweek[2].isoformat())).fetchone()[0]
-        print(" #### last week result: ", lastweek[1], lastweek[2], lastweekresult, lastweek[1].isoformat(), lastweek[2].isoformat())
+        print(" #### last week result: ", lastweekresult, lastweek[1].isoformat()[1], lastweek[2].isoformat()[1])
         db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, wasill))
         db.commit()
     db.close()

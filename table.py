@@ -71,7 +71,6 @@ def printintermediateresults(date, teams, db):
                 illcount += 1
         tbl.append([t[1], tgoal, tmileage, tpct/(len(runners)-illcount)])
         print("   ==== team ", [t[1], tgoal, tmileage, tpct/(len(runners)-illcount)])
-    print(tbl)
     tbl = sorted(tbl, key=lambda x: x[3], reverse = True)
     odd = True
     for team in tbl:
@@ -150,7 +149,6 @@ def mkIndex(date):
     for w in range(week, 0, -1):
         weeklog = [t for t in teamlog if t[0]==w]
         print(">>>> Week ", w)
-        print(weeklog)
         if weeklog:
             output += printfinalresults(w, weeklog, teams)
     inp = open('index.template')
