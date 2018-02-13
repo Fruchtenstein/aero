@@ -64,9 +64,9 @@ def printintermediateresults(date, teams, db):
                 tgoal += g
                 tmileage += d[0]
                 tpct += 100*52*d[0]/g
-                print("tpct:", tpct)
+#                print("tpct:", tpct)
             else:
-                print("   --- ", r, 0, g/52, 0)
+#                print("   --- ", r, 0, g/52, 0)
             if d and d[1]:
                 illcount += 1
         tbl.append([t[1], tgoal, tmileage, tpct/(len(runners)-illcount)])
@@ -132,7 +132,7 @@ def mkIndex(date):
         for row in c1.execute('SELECT teamid, SUM(100*distance/(goal/52))/COUNT(*) AS percentage, SUM(distance), SUM(goal)/52 FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND week=? AND wlog.wasill=0 GROUP BY teamid ORDER BY percentage DESC',
                 (w,)).fetchall():
             oneweeklog.append([w, row[0], row[1], row[2], row[3]])
-            print("   ******", [w, row])
+#            print("   ******", [w, row])
         for n,t in enumerate(oneweeklog):
             pts = len(oneweeklog)*5-n*5-5
             teampoints[t[1]-1] += pts
@@ -192,7 +192,7 @@ def mkTeams(date):
             odd = True
             for r in runners:
                 rdata = c1.execute('SELECT COALESCE(distance,0),wasill FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()
-                print(" ////////// ", r[0], week, rdata)
+#                print(" ////////// ", r[0], week, rdata)
                 rmileage = rdata[0] if rdata else 0
                 wasill = rdata[1] if rdata else 0
                 rgoal = r[3]/52
@@ -208,7 +208,7 @@ def mkTeams(date):
                     ill = "ДА"
                 outteam.append('                 <tr{}><td><a href="http://aerobia.ru/users/{}">{}</a></td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{}</td></tr>'.format(alt, r[0], r[1], rgoal, rmileage, rmileage*100/rgoal, ill))
                 odd = not odd
-            print(t, tgoal, tmileage)
+#            print(t, tgoal, tmileage)
             outteam.append('               <tfoot><tr><td>Всего:</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td><td></td></tr></tfoot>'.format(tgoal, tmileage, tpct/numberofrunners))
             outteam.append('               </tbody>')
             outteam.append('            </table></div>')

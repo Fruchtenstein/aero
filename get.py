@@ -36,12 +36,12 @@ def getdata(runnerid, date, session, dataurl):
     workouts = root.findall('.//r')
     #c2.execute("DELETE FROM log WHERE runnerid=? AND date>? AND date<?", (runnerid, weekrange[1].isoformat(), weekrange[2].isoformat()))
     for w in workouts:
-        print("  ---- workout:", w.attrib['id'], runnerid, w.attrib['start_at'])
+#        print("  ---- workout:", w.attrib['id'], runnerid, w.attrib['start_at'])
         if w.attrib['sport'] in ["Бег", "Спортивное ориентирование", "Беговая дорожка"]:
-            print("    ==== run:", w.attrib['distance'], " km, ", w.attrib['duration'])
+#            print("    ==== run:", w.attrib['distance'], " km, ", w.attrib['duration'])
             rundate = dateutil.parser.parse(w.attrib['start_at'])
             if rundate >= weekrange[1] and rundate <= weekrange[2]:
-                print("      >>>> valid date: ", rundate)
+                print("      >>>> valid date: ", rundate, w.attrib['distance'], " km, ", w.attrib['duration'])
                 db = sqlite3.connect('aerobia.db')
                 c2 = db.cursor()
                 c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?, ?, ?)', (w.attrib['id'], runnerid, w.attrib['start_at'], w.attrib['distance'], w.attrib['duration'], w.attrib['sport']))
