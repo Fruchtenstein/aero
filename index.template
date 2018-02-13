@@ -49,79 +49,71 @@
   <h3><a href="http://aerobia.ru/my/clubs">Клубы</a></h3>
   <ul>
       <li>
-        <a href="http://aerobia.ru/clubs/413" class="avatar"><img src="http://cdn.aerobia.ru/entities/413_cup3_thumbnail.jpg" /></a>
+        <a href="http://aerobia.ru/clubs/413" class="avatar"><img src="assets/413_cup3_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/413">Кубок Аэробии</a></b>
         </div>
       </li>
       <li>
-        <a href="http://aerobia.ru/clubs/153" class="avatar"><img src="http://cdn.aerobia.ru/entities/153_Boston-Running-Routes_thumbnail.jpg" /></a>
+        <a href="http://aerobia.ru/clubs/153" class="avatar"><img src="assets/153_Boston-Running-Routes_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/153">Все о беге</a></b>
         </div>
       </li>
       <li>
-        <a href="http://aerobia.ru/clubs/190" class="avatar"><img src="http://cdn.aerobia.ru/entities/190_aerobia-watch-1_(1)_thumbnail.jpg" /></a>
+        <a href="http://aerobia.ru/clubs/190" class="avatar"><img src="assets/190_aerobia_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/190">Аэробия</a></b>
         </div>
       </li>
       <li>
-        <a href="http://aerobia.ru/clubs/417" class="avatar"><img src="http://cdn.aerobia.ru/entities/417_logo_team1_copy44_thumbnail.jpg" /></a>
+        <a href="http://aerobia.ru/clubs/417" class="avatar"><img src="assets/417_logo_team1_copy44_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/417">Команда № 1</a></b>
         </div>
       </li>
       <li>
-        <a href="http://aerobia.ru/clubs/418" class="avatar"><img src="http://cdn.aerobia.ru/entities/418_2018-01-05_20-28-01_thumbnail.jpg" /></a>
+        <a href="http://aerobia.ru/clubs/418" class="avatar"><img src="assets/418_2018-01-05_20-28-01_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/418">Золотые люди</a></b>
         </div>
       </li>
       <li>
-        <a href="http://aerobia.ru/clubs/416" class="avatar"><img src="http://aerobia.ru/assets/default/avatar_thumbnail.jpg" /></a>
+        <a href="http://aerobia.ru/clubs/416" class="avatar"><img src="assets/avatar_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/416">Семь верст не крюк</a></b>
         </div>
       </li>
       <li>
-        <a href="http://aerobia.ru/clubs/421" class="avatar"><img src="http://aerobia.ru/assets/default/avatar_thumbnail.jpg" /></a>
+        <a href="http://aerobia.ru/clubs/421" class="avatar"><img src="assets/avatar_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/421">Спортивный квартал</a></b>
         </div>
       </li>
       <li>
-        <a href="http://aerobia.ru/clubs/423" class="avatar"><img src="http://cdn.aerobia.ru/entities/423_c62ac12373dec8179712ba6e7b87c7dd8ae14703_thumbnail.jpg" /></a>
+        <a href="http://aerobia.ru/clubs/423" class="avatar"><img src="assets/423_c62ac12373dec8179712ba6e7b87c7dd8ae14703_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/423">Пятый элемент</a></b>
         </div>
       </li>
       <li>
-        <a href="http://aerobia.ru/clubs/419" class="avatar"><img src="http://aerobia.ru/assets/default/avatar_thumbnail.jpg" /></a>
+        <a href="http://aerobia.ru/clubs/419" class="avatar"><img src="assets/avatar_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/419">Палата №6</a></b>
         </div>
       </li>
       <li>
-        <a href="http://aerobia.ru/clubs/422" class="avatar"><img src="http://cdn.aerobia.ru/entities/422_bestfriend1_thumbnail.jpg" /></a>
+        <a href="http://aerobia.ru/clubs/422" class="avatar"><img src="assets/422_bestfriend1_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/422">Великолепная семерка</a></b>
         </div>
       </li>
       <li>
-        <a href="http://aerobia.ru/clubs/415" class="avatar"><img src="http://cdn.aerobia.ru/entities/415_barra_thumbnail.jpg" /></a>
+        <a href="http://aerobia.ru/clubs/415" class="avatar"><img src="assets/415_barra_thumbnail.jpg" /></a>
         <div>
           <b><a href="http://aerobia.ru/clubs/415">Барракуды</a></b>
         </div>
       </li>
-      <!--
-      <li>
-        <a href="http://aerobia.ru/clubs/391" class="avatar"><img src="http://cdn.aerobia.ru/entities/391_club4_thumbnail.jpg" /></a>
-        <div>
-          <b><a href="http://aerobia.ru/clubs/391">Ленивые тюлени</a></b>
-        </div>
-      </li>
-      -->
   </ul>
 </aside>
 
