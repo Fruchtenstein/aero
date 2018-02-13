@@ -65,7 +65,7 @@ def printintermediateresults(date, teams, db):
                 tmileage += d[0]
                 tpct += 100*52*d[0]/g
 #                print("tpct:", tpct)
-            else:
+#            else:
 #                print("   --- ", r, 0, g/52, 0)
             if d and d[1]:
                 illcount += 1
