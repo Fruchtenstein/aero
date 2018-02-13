@@ -43,7 +43,7 @@ def printintermediateresults(date, teams, db):
     c2 = db.cursor()
     output = []
     output.append('            <center>')
-    output.append('                <h1>Промежуточные результаты {} недели</h1>'.format(date.isocalendar()[1]))
+    output.append('                <h1>Предварительные результаты {} недели</h1>'.format(date.isocalendar()[1]))
     output.append('            </center>')
     output.append('            <div class="datagrid"><table>')
     output.append('               <thead><tr><th>Команда</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено (%)</th></tr></thead>')

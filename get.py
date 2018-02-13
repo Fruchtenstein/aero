@@ -84,7 +84,7 @@ for r in runners:
     print(" #### this week result: ", thisweek[1], thisweek[2], thisweekresult)
     db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, thisweek[0], thisweekresult, isill))
     db.commit()
-    if now.weekday() < 3:
+    if now.weekday() < 2:
         print(" #### retrieve last week")
         ill = db.execute('SELECT wasill FROM wlog WHERE runnerid=? AND week=?', (runnerid, lastweek[0])).fetchone()
         wasill = ill[0] if ill else 0
