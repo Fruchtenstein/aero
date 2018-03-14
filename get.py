@@ -20,6 +20,11 @@ def week_range(date):
 
 def parseuser(runnerid, date, session):
     weekrange = week_range(date)
+    db = sqlite3.connect('aerobia.db')
+    c2 = db.cursor()
+    c2.execute("DELETE FROM log WHERE runnerid=? AND date>? AND date<?", (runnerid, weekrange[1].isoformat(), weekrange[2].isoformat()))
+    db.commit()
+    db.close()
     dataurl = "http://aerobia.ru/api/users/{}/calendar/{}/{:02d}".format(runnerid, weekrange[2].year, weekrange[2].month)
     getdata(runnerid, date, session, dataurl)
     if weekrange[1].month < weekrange[2].month:
