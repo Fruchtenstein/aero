@@ -131,10 +131,18 @@ def mkIndex(date):
         oneweeklog = []
         for row in c1.execute('SELECT teamid, SUM(100*distance/(goal/52))/COUNT(*) AS percentage, SUM(distance), SUM(goal)/52 FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND week=? AND wlog.wasill=0 GROUP BY teamid ORDER BY percentage DESC',
                 (w,)).fetchall():
-            oneweeklog.append([w, row[0], row[1], row[2], row[3]])
-#            print("   ******", [w, row])
+            totalrunners=c1.execute('SELECT COUNT(*) FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND teamid=? AND week=?', (row[0], w)).fetchone()
+            illrunners=c1.execute('SELECT COUNT(*) FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND teamid=? AND week=? AND wasill=1', (row[0], w)).fetchone()
+            if illrunners[0]/totalrunners[0] > 0.5:
+                oneweeklog.append([w, row[0], -1, row[2], row[3]])
+            else:
+                oneweeklog.append([w, row[0], row[1], row[2], row[3]])
+        oneweeklog = sorted(oneweeklog, key=lambda x: x[2], reverse = True)
         for n,t in enumerate(oneweeklog):
-            pts = len(oneweeklog)*5-n*5-5
+            if t[1]==-1:
+                pts = 0
+            else:
+                pts = len(oneweeklog)*5-n*5-5
             teampoints[t[1]-1] += pts
             oneweeklog[n].append(pts)
             oneweeklog[n].append(teampoints[t[1]-1])
