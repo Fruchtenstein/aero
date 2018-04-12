@@ -85,7 +85,8 @@ for r in runners:
     parseuser(runnerid, now, s)
     thisweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1].isoformat(), thisweek[2].isoformat())).fetchone()[0]
     print(" #### this week result: ", thisweekresult)
-    db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, thisweek[0], thisweekresult, isill))
+#    db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, thisweek[0], thisweekresult, isill))
+    db.execute('UPDATE wlog SET distance=?,wasill=? WHERE runnerid=? AND week=?', (thisweekresult, isill, runnerid, thisweek[0]))
     db.commit()
     if now.weekday() < 2:
         print(" #### retrieve last week")
@@ -94,7 +95,8 @@ for r in runners:
         parseuser(runnerid, weekago, s)
         lastweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1].isoformat(), lastweek[2].isoformat())).fetchone()[0]
         print(" #### last week result: ", lastweekresult, lastweek[1].isoformat()[1], lastweek[2].isoformat()[1])
-        db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, wasill))
+#        db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, wasill))
+        db.execute('UPDATE wlog SET distance=?,wasill=? WHERE runnerid=? AND week=?', (lastweekresult, isill, runnerid, lastweek[0]))
         db.commit()
     db.close()
 #db.commit()
