@@ -57,16 +57,13 @@ def printintermediateresults(date, teams, db):
         runners = c1.execute('SELECT runnerid,goal FROM runners WHERE teamid = ?', (t[0],)).fetchall()
         illcount = 0
         for (r,g) in runners:
-            d = c2.execute('SELECT COALESCE(distance,0),wasill FROM wlog WHERE runnerid=? AND week=?', (r, weekrange[0])).fetchone()
+            d = c2.execute('SELECT COALESCE(distance,0),wasill,wplan FROM wlog WHERE runnerid=? AND week=?', (r, weekrange[0])).fetchone()
 #            (d,) = c2.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date > ? AND date < ? AND isill=0', (r, weekrange[1].isoformat(), weekrange[2].isoformat())).fetchone()
             if d and not d[1]:
-                print("   +++ ", r, d[0], g/52, 100*52*d[0]/g)
-                tgoal += g
+                print("   +++ ", r, d[0], d[2], 100*d[0]/d[2])
+                tgoal += d[2]
                 tmileage += d[0]
-                tpct += 100*52*d[0]/g
-#                print("tpct:", tpct)
-#            else:
-#                print("   --- ", r, 0, g/52, 0)
+                tpct += 100*d[0]/d[2]
             if d and d[1]:
                 illcount += 1
         tbl.append([t[1], tgoal, tmileage, tpct/(len(runners)-illcount)])
@@ -75,7 +72,7 @@ def printintermediateresults(date, teams, db):
     odd = True
     for team in tbl:
         alt = ' class="alt"' if odd else ''
-        output.append('                    <tr{}><td>{}</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr>'.format(alt, team[0], team[1]/52, team[2], team[3]))
+        output.append('                    <tr{}><td>{}</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td></tr>'.format(alt, team[0], team[1], team[2], team[3]))
         odd = not odd
     output.append('                </tbody>')
     output.append('             </table>')
@@ -129,7 +126,8 @@ def mkIndex(date):
         teampoints.append(0)
     for w in range(1,week+1):
         oneweeklog = []
-        for row in c1.execute('SELECT teamid, SUM(100*distance/(goal/52))/COUNT(*) AS percentage, SUM(distance), SUM(goal)/52 FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND week=? AND wlog.wasill=0 GROUP BY teamid ORDER BY percentage DESC',
+#        for row in c1.execute('SELECT teamid, SUM(100*distance/(goal/52))/COUNT(*) AS percentage, SUM(distance), SUM(goal)/52 FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND week=? AND wlog.wasill=0 GROUP BY teamid ORDER BY percentage DESC',
+        for row in c1.execute('SELECT teamid, SUM(100*distance/wplan)/COUNT(*) AS percentage, SUM(distance), SUM(wplan) FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND week=? AND wlog.wasill=0 GROUP BY teamid ORDER BY percentage DESC',
                 (w,)).fetchall():
             totalrunners=c1.execute('SELECT COUNT(*) FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND teamid=? AND week=?', (row[0], w)).fetchone()
             illrunners=c1.execute('SELECT COUNT(*) FROM wlog,runners WHERE wlog.runnerid=runners.runnerid AND teamid=? AND week=? AND wasill=1', (row[0], w)).fetchone()
@@ -199,16 +197,17 @@ def mkTeams(date):
             numberofrunners = len(runners)
             odd = True
             for r in runners:
-                rdata = c1.execute('SELECT COALESCE(distance,0),wasill FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()
+                rdata = c1.execute('SELECT COALESCE(distance,0),wasill,wplan FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()
 #                print(" ////////// ", r[0], week, rdata)
                 rmileage = rdata[0] if rdata else 0
                 wasill = rdata[1] if rdata else 0
-                rgoal = r[3]/52
+#                rgoal = r[3]/52
+                rgoal = rdata[2] if rdata else r[3]/52
                 if wasill==0:
                     alt = ' class="alt"' if odd else ''
                     tmileage += rmileage
                     tgoal += rgoal
-                    tpct += rmileage*100/rgoal
+                    tpct += rmileage*100/rgoal if rgoal else 100
                     ill = ""
                 else:
                     numberofrunners -= 1
@@ -263,7 +262,7 @@ def mkStat(date):
         outstat.append('            <center>')
         outstat.append('                <h1>Лучший бегун {} недели:</h1>'.format(week))
         outstat.append('                <h1>Митя ☮ Фруктенштейн</h1>')
-        outstat.append('                <h2>(за то, что выздоровел!)</h2>')
+        outstat.append('                <h2>(за то, что бегает!)</h2>')
         outstat.append('                <hr />')
         outstat.append('            </center>')
         outstat.append('')
@@ -280,7 +279,7 @@ def mkStat(date):
             outstat.append('            </center>')
             outstat.append('')
     
-        winner = c1.execute('SELECT runnerid, MAX(pct) FROM (SELECT log.runnerid, 100*SUM(distance)/(goal/52) AS pct FROM log,runners WHERE date > ? AND date < ? AND log.runnerid=runners.runnerid GROUP BY log.runnerid)',(w[1].isoformat(), w[2].isoformat())).fetchone()
+        winner = c1.execute('SELECT runnerid, MAX(pct) FROM (SELECT log.runnerid, 100*SUM(wlog.distance)/wplan AS pct FROM log,wlog WHERE date > ? AND date < ? AND log.runnerid=wlog.runnerid AND week=? GROUP BY log.runnerid)',(w[1].isoformat(), w[2].isoformat(), week)).fetchone()
         print("Winner: ",winner)
         if winner[0]:
             winnername = c1.execute('SELECT runnername FROM runners WHERE runnerid=?',(winner[0],)).fetchone()
