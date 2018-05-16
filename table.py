@@ -267,7 +267,7 @@ def mkStat(date):
         outstat.append('            </center>')
         outstat.append('')
     
-        winner = c1.execute('SELECT runnerid, MAX(d) FROM (SELECT runnerid, SUM(distance) AS d FROM log WHERE date > ? AND date < ? GROUP BY runnerid)',(w[1].isoformat(), w[2].isoformat())).fetchone()
+        winner = c1.execute('SELECT runnerid, MAX(distance) FROM wlog WHERE week=? and wasill=0',(week,)).fetchone()
         print("Winner: ",winner)
         if winner[0]:
             winnername = c1.execute('SELECT runnername FROM runners WHERE runnerid=?',(winner[0],)).fetchone()
@@ -279,7 +279,7 @@ def mkStat(date):
             outstat.append('            </center>')
             outstat.append('')
     
-        winner = c1.execute('SELECT runnerid, MAX(pct) FROM (SELECT log.runnerid, 100*SUM(log.distance)/wplan AS pct FROM log,wlog WHERE date > ? AND date < ? AND log.runnerid=wlog.runnerid AND week=? GROUP BY log.runnerid)',(w[1].isoformat(), w[2].isoformat(), week)).fetchone()
+        winner = c1.execute('SELECT runnerid, MAX(100*distance/wplan) FROM wlog WHERE week=?',(week,)).fetchone()
         print("Winner: ",winner)
         if winner[0]:
             winnername = c1.execute('SELECT runnername FROM runners WHERE runnerid=?',(winner[0],)).fetchone()
