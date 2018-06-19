@@ -173,6 +173,7 @@ def mkIndex(date):
 def mkTeams(date):
     for week in range(1, date.isocalendar()[1]+1):
         print("teams week:", week)
+        eow = datetime.datetime.strptime("2018-W"+str(week)+"-1", "%Y-W%W-%w")
         db = sqlite3.connect('aerobia.db')
         c1 = db.cursor()
         teams = c1.execute('SELECT * FROM teams ORDER BY teamid').fetchall()
@@ -190,7 +191,7 @@ def mkTeams(date):
             outteam.append('                <h2>{}</h2>'.format(t[1]))
             outteam.append('            </center>')
             outteam.append('            <div class="datagrid"><table>')
-            outteam.append('               <thead><tr><th>Имя</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено (%)</th><th>На больничном</th></tr></thead>')
+            outteam.append('               <thead><tr><th>Имя</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено (%)</th><th>Превышение</th></tr></thead>')
             outteam.append('               <tbody>')
             runners = c1.execute('SELECT * FROM runners WHERE teamid=? ORDER BY runnername', (t[0],)).fetchall()
             runners = sorted(runners, key=lambda x: x[3], reverse = True)
@@ -203,12 +204,19 @@ def mkTeams(date):
                 wasill = rdata[1] if rdata else 0
 #                rgoal = r[3]/52
                 rgoal = rdata[2] if rdata else r[3]/52
+                yeargoal = rdata[2]*52 if rdata else r[3]
+                yeartotal = c1.execute('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid=? AND date<?', (r[0], eow)).fetchone()[0]
+                print("~~~~~~~ runner: ", r, " eow: ", eow, " total: ", yeartotal, " goal: ", yeargoal)
                 if wasill==0:
-                    alt = ' class="alt"' if odd else ''
+                    if yeartotal > yeargoal:
+                      alt = ' class="alt ill"' if odd else ' class="ill"'
+                      ill = "ДА"
+                    else:
+                      alt = ' class="alt"' if odd else ''
+                      ill = ""
                     tmileage += rmileage
                     tgoal += rgoal
                     tpct += rmileage*100/rgoal if rgoal else 100
-                    ill = ""
                     outteam.append('                 <tr{}><td><a href="http://aerobia.ru/users/{}">{}</a></td><td>{:0.2f}</td><td>{:0.2f}</td><td>{:0.2f}</td><td>{}</td></tr>'.format(alt, r[0], r[1], rgoal, rmileage, rmileage*100/rgoal, ill))
                     odd = not odd
                 else:

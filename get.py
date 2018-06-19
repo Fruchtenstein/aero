@@ -23,16 +23,17 @@ def parseuser(runnerid, date, session):
     db = sqlite3.connect('aerobia.db')
     c2 = db.cursor()
     c2.execute("DELETE FROM log WHERE runnerid=? AND date>? AND date<?", (runnerid, weekrange[1].isoformat(), weekrange[2].isoformat()))
+    goal = c2.execute("SELECT wplan*52 FROM wlog WHERE runnerid=? AND week=?", (runnerid, weekrange[0])).fetchone()[0]
     db.commit()
     db.close()
     dataurl = "http://aerobia.ru/api/users/{}/calendar/{}/{:02d}".format(runnerid, weekrange[2].year, weekrange[2].month)
-    getdata(runnerid, date, session, dataurl)
+    getdata(runnerid, date, session, dataurl, goal)
     if weekrange[1].month < weekrange[2].month:
         dataurl = "http://aerobia.ru/api/users/{}/calendar/{}/{:02d}".format(runnerid, weekrange[1].year, weekrange[1].month)
-        getdata(runnerid, date, session, dataurl)
+        getdata(runnerid, date, session, dataurl, goal)
 
 
-def getdata(runnerid, date, session, dataurl):
+def getdata(runnerid, date, session, dataurl, goal):
     weekrange = week_range(date)
     print("requesting "+dataurl)
     r = session.get(dataurl)
@@ -49,7 +50,13 @@ def getdata(runnerid, date, session, dataurl):
                 print("      >>>> valid date: ", rundate, w.attrib['distance'], " km, ", w.attrib['duration'])
                 db = sqlite3.connect('aerobia.db')
                 c2 = db.cursor()
-                c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?, ?, ?)', (w.attrib['id'], runnerid, w.attrib['start_at'], w.attrib['distance'], w.attrib['duration'], w.attrib['sport']))
+                total = c2.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date<?', (runnerid, w.attrib['start_at'])).fetchone()[0]
+                if total > goal:
+                    print("%%%%%%%%%% Annual goal ", goal, " exceeded by ", runnerid, ": ", total)
+                    thisdistance = float(w.attrib['distance'])*0.2
+                else:
+                    thisdistance = w.attrib['distance']
+                c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?, ?, ?)', (w.attrib['id'], runnerid, w.attrib['start_at'], thisdistance, w.attrib['duration'], w.attrib['sport']))
                 db.commit()
                 db.close()
 
