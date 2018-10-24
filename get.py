@@ -71,7 +71,7 @@ weekago = now - datetime.timedelta(days=7)
 monthago = now.replace(day=1) - datetime.timedelta(days=1)
 thisweek = week_range(now) 
 lastweek = week_range(weekago)
-loginurl="http://aerobia.ru/users/sign_in"
+loginurl="https://aerobia.ru/users/sign_in"
 data = {"user[email]": credentials[0], "user[password]": credentials[1]}
 s = requests.session()
 s.headers.update({'User-Agent':'Mozilla/4.0'})
