@@ -40,7 +40,6 @@ def getdata(runnerid, date, session, dataurl, goal):
     xml = r.content
     root = lxml.etree.fromstring(xml)
     workouts = root.findall('.//r')
-    #c2.execute("DELETE FROM log WHERE runnerid=? AND date>? AND date<?", (runnerid, weekrange[1].isoformat(), weekrange[2].isoformat()))
     for w in workouts:
 #        print("  ---- workout:", w.attrib['id'], runnerid, w.attrib['start_at'])
         if w.attrib['sport'] in ["Бег", "Спортивное ориентирование", "Беговая дорожка"]:
@@ -50,12 +49,7 @@ def getdata(runnerid, date, session, dataurl, goal):
                 print("      >>>> valid date: ", rundate, w.attrib['distance'], " km, ", w.attrib['duration'])
                 db = sqlite3.connect('aerobia.db')
                 c2 = db.cursor()
-                total = c2.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date<?', (runnerid, w.attrib['start_at'])).fetchone()[0]
-                if total > goal:
-                    print("%%%%%%%%%% Annual goal ", goal, " exceeded by ", runnerid, ": ", total)
-                    thisdistance = float(w.attrib['distance'])*0.2
-                else:
-                    thisdistance = w.attrib['distance']
+                thisdistance = w.attrib['distance']
                 c2.execute('INSERT OR REPLACE INTO log VALUES (?, ?, ?, ?, ?, ?)', (w.attrib['id'], runnerid, w.attrib['start_at'], thisdistance, w.attrib['duration'], w.attrib['sport']))
                 db.commit()
                 db.close()
@@ -71,7 +65,7 @@ weekago = now - datetime.timedelta(days=7)
 monthago = now.replace(day=1) - datetime.timedelta(days=1)
 thisweek = week_range(now) 
 lastweek = week_range(weekago)
-loginurl="http://aerobia.ru/users/sign_in"
+loginurl="https://aerobia.ru/users/sign_in"
 data = {"user[email]": credentials[0], "user[password]": credentials[1]}
 s = requests.session()
 s.headers.update({'User-Agent':'Mozilla/4.0'})
@@ -86,12 +80,22 @@ for r in runners:
     runnerid = r[0]
 #    isill = r[1]
     db = sqlite3.connect('aerobia.db')
+    goal = db.execute('SELECT goal FROM runners WHERE runnerid=?', (runnerid,)).fetchone()[0]
     ill = db.execute('SELECT wasill FROM wlog WHERE runnerid=? ORDER BY week DESC LIMIT 1', (runnerid,)).fetchone()
     isill = ill[0] if ill else 0
     print(" #### retrieve this week")
     parseuser(runnerid, now, s)
+    total = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=?', (runnerid,)).fetchone()[0]
     thisweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1].isoformat(), thisweek[2].isoformat())).fetchone()[0]
     print(" #### this week result: ", thisweekresult)
+    if total > goal:
+        if (total - thisweekresult) >= goal:
+            # goal exceeded before this week, tax full result
+            thisweekresult *= 0.2
+        else:
+            # goal exceeded this week, calculate the excess and tax it
+            excess = total - goal
+            thisweekresult = (thisweekresult - excess) + (excess * 0.2)
 #    db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, thisweek[0], thisweekresult, isill))
     db.execute('UPDATE wlog SET distance=?,wasill=? WHERE runnerid=? AND week=?', (thisweekresult, isill, runnerid, thisweek[0]))
     db.commit()
@@ -100,8 +104,17 @@ for r in runners:
         ill = db.execute('SELECT wasill FROM wlog WHERE runnerid=? AND week=?', (runnerid, lastweek[0])).fetchone()
         wasill = ill[0] if ill else 0
         parseuser(runnerid, weekago, s)
+        total = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? and date<?', (runnerid, lastweek[2].isoformat())).fetchone()[0]
         lastweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1].isoformat(), lastweek[2].isoformat())).fetchone()[0]
         print(" #### last week result: ", lastweekresult, lastweek[1].isoformat()[1], lastweek[2].isoformat()[1])
+        if total > goal:
+            if (total - lastweekresult) >= goal:
+                # goal exceeded before this week, tax full result
+                lastweekresult *= 0.2
+            else:
+                # goal exceeded this week, calculate the excess and tax it
+                excess = total - goal
+                lastweekresult = (lastweekresult - excess) + (excess * 0.2)
 #        db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, lastweek[0], lastweekresult, wasill))
         db.execute('UPDATE wlog SET distance=?,wasill=? WHERE runnerid=? AND week=?', (lastweekresult, isill, runnerid, lastweek[0]))
         db.commit()

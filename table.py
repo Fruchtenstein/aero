@@ -5,6 +5,7 @@ import datetime
 import pytz
 import os
 from string import Template
+import config
 
 def week_range(date):
     utc=pytz.UTC
@@ -149,8 +150,9 @@ def mkIndex(date):
     output2 = printstandings(teams, teampoints) 
 
     output = []
-    output += printintermediateresults(date, teams, db)
-    if dolastweek:
+    if date < config.ENDCHM:
+        output += printintermediateresults(date, teams, db)
+    if dolastweek and date < config.ENDCHM:
         output += printintermediateresults(date - datetime.timedelta(days=7), teams, db)
     for w in range(week, 0, -1):
         weeklog = [t for t in teamlog if t[0]==w]
@@ -199,10 +201,8 @@ def mkTeams(date):
             odd = True
             for r in runners:
                 rdata = c1.execute('SELECT COALESCE(distance,0),wasill,wplan FROM wlog WHERE runnerid=? AND week=?', (r[0], week)).fetchone()
-#                print(" ////////// ", r[0], week, rdata)
                 rmileage = rdata[0] if rdata else 0
                 wasill = rdata[1] if rdata else 0
-#                rgoal = r[3]/52
                 rgoal = rdata[2] if rdata else r[3]/52
                 yeargoal = rdata[2]*52 if rdata else r[3]
                 yeartotal = c1.execute('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid=? AND date<?', (r[0], eow)).fetchone()[0]
@@ -344,12 +344,18 @@ def mkRules(now):
 
 print("-------------------- ",datetime.datetime.now())
 now = datetime.date.today()
-#mkIndex(now - datetime.timedelta(days=7))
-#mkTeams(now - datetime.timedelta(days=7))
-#mkStat(now - datetime.timedelta(days=7))
-mkIndex(now)
-mkTeams(now)
-mkStat(now)
-mkRules(now)
+if now > config.STARTCHM and now < config.ENDCHM:
+    #mkIndex(now - datetime.timedelta(days=7))
+    #mkTeams(now - datetime.timedelta(days=7))
+    #mkStat(now - datetime.timedelta(days=7))
+    mkIndex(now)
+    mkTeams(now)
+    mkStat(now)
+    mkRules(now)
+elif now > config.STARTCUP:
+    mkIndexCup(now)
+    mkTeamsCup(now)
+    mkStatCup(now)
+    mkRules(now)
 print("-------------------- ",datetime.datetime.now())
 
