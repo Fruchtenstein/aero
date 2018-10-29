@@ -86,7 +86,7 @@ for r in runners:
     print(" #### retrieve this week")
     parseuser(runnerid, now, s)
     total = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=?', (runnerid,)).fetchone()[0]
-    thisweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1].isoformat(), thisweek[2].isoformat())).fetchone()[0]
+    thisweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1].isoformat(), thisweek[2].isoformat())).fetchone()[0] or 0
     print(" #### this week result: ", thisweekresult)
     if total > goal:
         if (total - thisweekresult) >= goal:
