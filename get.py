@@ -104,8 +104,8 @@ for r in runners:
         ill = db.execute('SELECT wasill FROM wlog WHERE runnerid=? AND week=?', (runnerid, lastweek[0])).fetchone()
         wasill = ill[0] if ill else 0
         parseuser(runnerid, weekago, s)
-        total = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? and date<?', (runnerid, lastweek[2].isoformat())).fetchone()[0]
-        lastweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1].isoformat(), lastweek[2].isoformat())).fetchone()[0]
+        total = db.execute('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid=? and date<?', (runnerid, lastweek[2].isoformat())).fetchone()[0]
+        lastweekresult = db.execute('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, lastweek[1].isoformat(), lastweek[2].isoformat())).fetchone()[0]
         print(" #### last week result: ", lastweekresult, lastweek[1].isoformat()[1], lastweek[2].isoformat()[1])
         if total > goal:
             if (total - lastweekresult) >= goal:
