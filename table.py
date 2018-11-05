@@ -204,7 +204,8 @@ def mkTeams(date):
                 rmileage = rdata[0] if rdata else 0
                 wasill = rdata[1] if rdata else 0
                 rgoal = rdata[2] if rdata else r[3]/52
-                yeargoal = rdata[2]*52 if rdata else r[3]
+#                yeargoal = rdata[2]*52 if rdata else r[3]
+                yeargoal = c1.execute('SELECT COALESCE(SUM(wplan),0) FROM wlog WHERE runnerid=?', (r[0],)).fetchone()[0]
                 yeartotal = c1.execute('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid=? AND date<?', (r[0], eow)).fetchone()[0]
                 print("~~~~~~~ runner: ", r, " eow: ", eow, " total: ", yeartotal, " goal: ", yeargoal)
                 if wasill==0:
