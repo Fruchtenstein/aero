@@ -10,6 +10,7 @@ import config
 def week_range(date):
     utc=pytz.UTC
     year, week, dow = date.isocalendar()
+    week = int(date.strftime("%W"))
     start_date = date - datetime.timedelta(dow-1)
     end_date = start_date + datetime.timedelta(6)
     return (week, utc.localize(datetime.datetime.combine(start_date, datetime.datetime.min.time())), utc.localize(datetime.datetime.combine(end_date, datetime.datetime.max.time())))
@@ -39,12 +40,12 @@ def printfinalresults(w, weeklog, teams):
     return output
 
 def printintermediateresults(date, teams, db):
-    print("====== Intermediate:", date.isocalendar()[1])
+    print("====== Intermediate:", date.strftime("%W"))
     c1 = db.cursor()
     c2 = db.cursor()
     output = []
     output.append('            <center>')
-    output.append('                <h1>Предварительные результаты {} недели</h1>'.format(date.isocalendar()[1]))
+    output.append('                <h1>Предварительные результаты {} недели</h1>'.format(date.strftime("%W")))
     output.append('            </center>')
     output.append('            <div class="datagrid"><table>')
     output.append('               <thead><tr><th>Команда</th><th>Цель (км/нед)</th><th>Результат (км)</th><th>Выполнено (%)</th></tr></thead>')
@@ -114,9 +115,9 @@ def mkIndex(date):
     print("date: ", date, "; weekday: ", date.weekday())
     print("do last week = ", dolastweek)
     if dolastweek:
-        week = date.isocalendar()[1] - 2
+        week = int(date.strftime("%W")) - 2
     else:
-        week = date.isocalendar()[1] - 1
+        week = int(date.strftime("%W")) - 1
     print("index week:", week)
     db = sqlite3.connect('aerobia.db')
     c1 = db.cursor()
@@ -159,11 +160,19 @@ def mkIndex(date):
         print(">>>> Week ", w)
         if weeklog:
             output += printfinalresults(w, weeklog, teams)
+
+    if datetime.date.today() > config.STARTCUP and datetime.date.today() < config.ENDCUP:
+        cupoutput = doCup()
+    else:
+        cupoutput = []
+
+
     inp = open('index.template')
     tpl = Template(inp.read())
     outstr = '\n'.join(output)
     outstr2 = '\n'.join(output2)
-    subst = {'table':outstr, 'table2':outstr2, 'week':str(date.isocalendar()[1]).zfill(2)}
+    cupstr = '\n'.join(cupoutput)
+    subst = {'cup':cupstr, 'table':outstr, 'table2':outstr2, 'week':date.strftime("%W")}
     result = tpl.substitute(subst)
     inp.close()
     out = open('html/index.html', 'w')
@@ -173,7 +182,7 @@ def mkIndex(date):
  
 
 def mkTeams(date):
-    for week in range(1, date.isocalendar()[1]+1):
+    for week in range(1, int(date.strftime("%W"))+1):
         print("teams week:", week)
         eow = datetime.datetime.strptime("2018-W"+str(week)+"-1", "%Y-W%W-%w")
         db = sqlite3.connect('aerobia.db')
@@ -233,7 +242,7 @@ def mkTeams(date):
         outteambox=[]
         outteambox.append('    <nav class="sub">')
         outteambox.append('      <ul>')
-        for w in range(1,date.isocalendar()[1]+1):
+        for w in range(1,int(date.strftime("%W"))+1):
             if w == week:
                 outteambox.append('        <li class="active"><span>{} неделя</span></li>'.format(w))
     #        elif os.path.isfile("html/teams{:02d}.html".format(w)):
@@ -249,7 +258,7 @@ def mkTeams(date):
         tpl = Template(inp.read())
         outstr = '\n'.join(outteam)
         outbox = '\n'.join(outteambox)
-        subst = {'box':outbox, 'table':outstr, 'week':str(date.isocalendar()[1]).zfill(2)}
+        subst = {'box':outbox, 'table':outstr, 'week':date.strftime("%W")}
         result = tpl.substitute(subst)
         inp.close()
         out = open('html/teams{:02d}.html'.format(week), 'w')
@@ -260,7 +269,7 @@ def mkTeams(date):
 
 def mkStat(date):
     dolastweek = date.weekday() < 2
-    for weeksago in range(0, date.isocalendar()[1]):
+    for weeksago in range(0, int(date.strftime("%W"))):
         dodate = date - datetime.timedelta(days=7*weeksago)
         w = week_range(dodate)
         week = w[0]
@@ -303,7 +312,7 @@ def mkStat(date):
         outstatbox=[]
         outstatbox.append('    <nav class="sub">')
         outstatbox.append('      <ul>')
-        for w in range(1,date.isocalendar()[1]+1):
+        for w in range(1,int(date.strftime("%W"))+1):
             if w == week:
     #            print("current week")
                 outstatbox.append('        <li class="active"><span>{} неделя</span></li>'.format(w))
@@ -318,13 +327,13 @@ def mkStat(date):
         outstatbox.append('    </nav>')
         inp = open('statistics.template')
         tpl = Template(inp.read())
-        print("       ))))) week:", week, " isocalendar[1]: ", date.isocalendar()[1], "dolastweek: ", dolastweek)
-        if week == date.isocalendar()[1] or (week == date.isocalendar()[1]-1 and dolastweek):
+        print("       ))))) week:", week, " week: ", date.strftime("%W"), "dolastweek: ", dolastweek)
+        if week == int(date.strftime("%W")) or (week == int(date.strftime("%W"))-1 and dolastweek):
             outstat = []
             outstat.append('    <h1>Результаты недели будут подведены позже</h1>')
         outstr = '\n'.join(outstat)
         outbox = '\n'.join(outstatbox)
-        subst = {'box':outbox, 'data':outstr, 'week':str(date.isocalendar()[1]).zfill(2)}
+        subst = {'box':outbox, 'data':outstr, 'week':date.strftime("%W")}
         result = tpl.substitute(subst)
         inp.close()
         out = open('html/statistics{:02d}.html'.format(week), 'w')
@@ -335,12 +344,54 @@ def mkStat(date):
 def mkRules(now):
         inp = open('rules.template')
         tpl = Template(inp.read())
-        subst = {'week':str(now.isocalendar()[1]).zfill(2)}
+        subst = {'week':now.strftime("%W")}
         result = tpl.substitute(subst)
         inp.close()
         out = open('html/rules.html', 'w')
         out.write(result)
         out.close()
+
+def doCup():
+    print("UUUUUUUUUUU")
+    today = datetime.date.today()
+    startcupweek = int(config.STARTCUP.strftime("%W"))
+    endcupweek = int(config.LASTCUP.strftime("%W"))
+    week = int(today.strftime("%W"))
+    dow = today.isocalendar()[2]
+    db = sqlite3.connect('aerobia.db')
+    c1 = db.cursor()
+    teams = c1.execute('SELECT * FROM teams ORDER BY teamid').fetchall()
+    cup = []
+    doweeks = []
+    if week >= startcupweek and week <= endcupweek:
+        doweeks.append(week)
+    if week > startcupweek and dow <3:
+        doweeks.append(week-1)
+    for w in doweeks:
+        (wstart, wend) = week_range(config.STARTCUP + datetime.timedelta(days=((w-startcupweek)*7)))
+        for t in teams:
+            runners = c1.execute('SELECT runnerid FROM runners WHERE teamid = ?', (t[0],)).fetchall()
+            runnerids = [i[0] for i in runners]
+            print (t, w, wstart, wend)
+            print('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid IN ({}) AND date > ? AND date < ?'.format(','.join(map(str,runnerids))))
+            d = c1.execute('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid IN ({}) AND date > ? AND date < ?'.format( ','.join(map(str,runnerids))), (wstart, wend)).fetchone()[0]
+            print(d)
+            c1.execute('INSERT OR REPLACE INTO cup VALUES (?, ?, ?)', (t[0], w, d))
+            cup.append([w,t[0],d])
+            db.commit()
+    print(cup)
+    db.close()
+    r = []
+    if today > CONFIG.startcup:
+
+
+
+
+#            for r in runners:
+#                teamdistance += c1.execute('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid = ? AND date > ? AND date < ?', (r, wstart, wend)).fetchone()[0]
+
+
+
 
 
 print("-------------------- ",datetime.datetime.now())
