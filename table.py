@@ -161,10 +161,10 @@ def mkIndex(date):
         if weeklog:
             output += printfinalresults(w, weeklog, teams)
 
-    if datetime.date.today() > config.STARTCUP and datetime.date.today() < config.ENDCUP:
+    if datetime.date.today() >= config.STARTCUP and datetime.date.today() < config.ENDCUP:
         cupoutput = doCup()
     else:
-        cupoutput = []
+        cupoutput = ['']
 
 
     inp = open('index.template')
@@ -357,10 +357,11 @@ def doCup():
     startcupweek = int(config.STARTCUP.strftime("%W"))
     endcupweek = int(config.LASTCUP.strftime("%W"))
     week = int(today.strftime("%W"))
+    cupweek = week - startcupweek + 1
     dow = today.isocalendar()[2]
     db = sqlite3.connect('aerobia.db')
     c1 = db.cursor()
-    teams = c1.execute('SELECT * FROM teams ORDER BY teamid').fetchall()
+    teams = c1.execute('SELECT teamid FROM playoff WHERE bracket=1 OR bracket=2').fetchall()
     cup = []
     doweeks = []
     if week >= startcupweek and week <= endcupweek:
@@ -368,7 +369,7 @@ def doCup():
     if week > startcupweek and dow <3:
         doweeks.append(week-1)
     for w in doweeks:
-        (wstart, wend) = week_range(config.STARTCUP + datetime.timedelta(days=((w-startcupweek)*7)))
+        (_, wstart, wend) = week_range(config.STARTCUP + datetime.timedelta(days=((w-startcupweek)*7)))
         for t in teams:
             runners = c1.execute('SELECT runnerid FROM runners WHERE teamid = ?', (t[0],)).fetchall()
             runnerids = [i[0] for i in runners]
@@ -381,11 +382,56 @@ def doCup():
             db.commit()
     print(cup)
     db.close()
-    r = []
-    if today > CONFIG.startcup:
+    output = []
+#    if today > CONFIG.startcup:
+    output.append('            <center>')
+    output.append('                <h1>Кубок Аэробии</h1>'.format(w))
+    output.append('                <br />')
+    output.append('                <br />')
+    output.append('            </center>')
+    for i in [1,2,3]:
+        output.extend(printbracket(i))
+    output.append('            <br />')
+    output.append('            <hr />')
+    return output
 
-
-
+def printbracket(n):
+    today = datetime.date.today()
+    week = int(today.strftime("%W"))
+    startcupweek = int(config.STARTCUP.strftime("%W"))
+    endcupweek = int(config.LASTCUP.strftime("%W"))
+    o = []
+    db = sqlite3.connect('aerobia.db')
+    c1 = db.cursor()
+    o.append('            <center>')
+    if n in [1,2]:
+        o.append('                <h1>Полуфинал {}</h1>'.format(n))
+    else:
+        o.append('                <h1>Финал</h1>'.format(n))
+    o.append('                <br />')
+    o.append('                <br />')
+    o.append('            </center>')
+    o.append('            <div class="datagrid"><table>')
+    o.append('               <thead><tr><th>Неделя</th><th>Команда</th><th>Результат (км)</th></thead>')
+    o.append('               <tbody>')
+    teams = c1.execute('SELECT teamid FROM playoff WHERE bracket=?', (n,)).fetchall() 
+    if not teams:
+        teams = ((0,),(0,))
+        teamnames = ('?','?')
+    else:
+        t1 = c1.execute('SELECT teamname FROM teams WHERE teamid=?',(teams[0][0],)).fetchone()[0]
+        t2 = c1.execute('SELECT teamname FROM teams WHERE teamid=?',(teams[1][0],)).fetchone()[0]
+        teamnames = (t1, t2)
+    for w in range (0,3):
+        (dist1,) = c1.execute('SELECT COALESCE(distance,0) FROM cup WHERE teamid=? AND week=?', (teams[0][0], startcupweek+w)).fetchone() or (0.0,)
+        (dist2,) = c1.execute('SELECT COALESCE(distance,0) FROM cup WHERE teamid=? AND week=?', (teams[1][0], startcupweek+w)).fetchone() or (0.0,)
+        print('D1:',dist1)
+        print('D2:',dist2)
+        o.append('             <tr><td rowspan="2">{}</td><td>{}</td><td>{:0.2f}</td></tr>'.format(w,teamnames[0],dist1))
+        o.append('             <tr><td>{}</td><td>{:0.2f}</td></tr>'.format(teamnames[1],dist2))
+    o.append('               </tbody>')
+    o.append('            </table></div>')
+    return o
 
 #            for r in runners:
 #                teamdistance += c1.execute('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid = ? AND date > ? AND date < ?', (r, wstart, wend)).fetchone()[0]
