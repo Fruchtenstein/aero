@@ -364,12 +364,8 @@ def doCup():
     teams = c1.execute('SELECT teamid FROM playoff WHERE bracket=1 OR bracket=2').fetchall()
     cup = []
     doweeks = []
-    if week >= startcupweek and week <= endcupweek:
-        doweeks.append(week)
-    if week > startcupweek and dow <3:
-        doweeks.append(week-1)
-    for w in doweeks:
-        (_, wstart, wend) = week_range(config.STARTCUP + datetime.timedelta(days=((w-startcupweek)*7)))
+    if week >= startcupweek and week <= endcupweek+1 and dow == config.DOW:
+        (_, wstart, wend) = week_range(today - datetime.timedelta(days=7))
         for t in teams:
             runners = c1.execute('SELECT runnerid FROM runners WHERE teamid = ?', (t[0],)).fetchall()
             runnerids = [i[0] for i in runners]
@@ -377,7 +373,7 @@ def doCup():
             print('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid IN ({}) AND date > ? AND date < ?'.format(','.join(map(str,runnerids))))
             d = c1.execute('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid IN ({}) AND date > ? AND date < ?'.format( ','.join(map(str,runnerids))), (wstart, wend)).fetchone()[0]
             print(d)
-            c1.execute('INSERT OR REPLACE INTO cup VALUES (?, ?, ?)', (t[0], w, d))
+            c1.execute('INSERT OR IGNORE INTO cup VALUES (?, ?, ?)', (t[0], w, d))
             cup.append([w,t[0],d])
             db.commit()
     print(cup)
@@ -385,7 +381,7 @@ def doCup():
     output = []
 #    if today > CONFIG.startcup:
     output.append('            <center>')
-    output.append('                <h1>Кубок Аэробии</h1>'.format(w))
+    output.append('                <h1>Кубок Аэробии</h1>'.format(week-1))
     output.append('                <br />')
     output.append('                <br />')
     output.append('            </center>')
@@ -442,18 +438,12 @@ def printbracket(n):
 
 print("-------------------- ",datetime.datetime.now())
 now = datetime.date.today()
-if now > config.STARTCHM and now < config.ENDCHM:
     #mkIndex(now - datetime.timedelta(days=7))
     #mkTeams(now - datetime.timedelta(days=7))
     #mkStat(now - datetime.timedelta(days=7))
-    mkIndex(now)
-    mkTeams(now)
-    mkStat(now)
-    mkRules(now)
-elif now > config.STARTCUP:
-    mkIndexCup(now)
-    mkTeamsCup(now)
-    mkStatCup(now)
-    mkRules(now)
+mkIndex(now)
+mkTeams(now)
+mkStat(now)
+mkRules(now)
 print("-------------------- ",datetime.datetime.now())
 
