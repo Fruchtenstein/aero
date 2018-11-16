@@ -367,19 +367,20 @@ def doCup():
     if week >= startcupweek and week <= endcupweek+1 and dow == config.DOW:
         (_, wstart, wend) = week_range(today - datetime.timedelta(days=7))
         for t in teams:
-            runners = c1.execute('SELECT runnerid FROM runners WHERE teamid = ?', (t[0],)).fetchall()
+            runners = c1.execute('SELECT runnerid FROM runners WHERE teamid = ? AND isill = 0', (t[0],)).fetchall()
             runnerids = [i[0] for i in runners]
-            print (t, w, wstart, wend)
+            print (t, week-1, wstart.isoformat(), wend.isoformat())
             print('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid IN ({}) AND date > ? AND date < ?'.format(','.join(map(str,runnerids))))
-            d = c1.execute('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid IN ({}) AND date > ? AND date < ?'.format( ','.join(map(str,runnerids))), (wstart, wend)).fetchone()[0]
+            d = c1.execute('SELECT COALESCE(SUM(distance),0) FROM log WHERE runnerid IN ({}) AND date > ? AND date < ?'.format( ','.join(map(str,runnerids))), (wstart.isoformat(), wend.isoformat())).fetchone()[0]
             print(d)
-            c1.execute('INSERT OR IGNORE INTO cup VALUES (?, ?, ?)', (t[0], w, d))
-            cup.append([w,t[0],d])
+            c1.execute('INSERT OR IGNORE INTO cup VALUES (?, ?, ?)', (t[0], week-1, d))
+            cup.append([week-1,t[0],d])
             db.commit()
     print(cup)
     db.close()
     output = []
 #    if today > CONFIG.startcup:
+    output.append('            <br />')
     output.append('            <center>')
     output.append('                <h1>Кубок Аэробии</h1>'.format(week-1))
     output.append('                <br />')
@@ -423,8 +424,8 @@ def printbracket(n):
         (dist2,) = c1.execute('SELECT COALESCE(distance,0) FROM cup WHERE teamid=? AND week=?', (teams[1][0], startcupweek+w)).fetchone() or (0.0,)
         print('D1:',dist1)
         print('D2:',dist2)
-        o.append('             <tr><td rowspan="2">{}</td><td>{}</td><td>{:0.2f}</td></tr>'.format(w,teamnames[0],dist1))
-        o.append('             <tr><td>{}</td><td>{:0.2f}</td></tr>'.format(teamnames[1],dist2))
+        o.append('             <tr><td rowspan="2">{}</td><td>{}</td><td>{:0.2f}</td></tr>'.format(w+1,teamnames[0],dist1))
+        o.append('             <tr class="alt"><td>{}</td><td>{:0.2f}</td></tr>'.format(teamnames[1],dist2))
     o.append('               </tbody>')
     o.append('            </table></div>')
     return o
