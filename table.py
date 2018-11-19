@@ -422,8 +422,12 @@ def printbracket(n):
         (dist2,) = c1.execute('SELECT COALESCE(distance,0) FROM cup WHERE teamid=? AND week=?', (teams[1][0], startcupweek+w)).fetchone() or (0.0,)
         print('D1:',dist1)
         print('D2:',dist2)
-        o.append('             <tr><td rowspan="2">{}</td><td>{}</td><td>{:0.2f}</td></tr>'.format(w+1,teamnames[0],dist1))
-        o.append('             <tr class="alt"><td>{}</td><td>{:0.2f}</td></tr>'.format(teamnames[1],dist2))
+        if w == 1:
+            o.append('             <tr class="alt"><td rowspan="2">{}</td><td>{}</td><td>{:0.2f}</td></tr>'.format(w+1,teamnames[0],dist1))
+            o.append('             <tr class="alt"><td>{}</td><td>{:0.2f}</td></tr>'.format(teamnames[1],dist2))
+        else:
+            o.append('             <tr><td rowspan="2">{}</td><td>{}</td><td>{:0.2f}</td></tr>'.format(w+1,teamnames[0],dist1))
+            o.append('             <tr><td>{}</td><td>{:0.2f}</td></tr>'.format(teamnames[1],dist2))
     o.append('               </tbody>')
     o.append('            </table></div>')
     return o
