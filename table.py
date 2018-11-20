@@ -396,9 +396,8 @@ def doCup():
 #    if today > CONFIG.startcup:
     output.append('            <br />')
     output.append('            <center>')
+    output.append('                <br />')
     output.append('                <h1>Кубок Аэробии</h1>'.format(week-1))
-    output.append('                <br />')
-    output.append('                <br />')
     output.append('            </center>')
     for i in [1,2,3]:
         output.extend(printbracket(i))
@@ -415,12 +414,11 @@ def printbracket(n):
     db = sqlite3.connect('aerobia.db')
     c1 = db.cursor()
     o.append('            <center>')
+    o.append('                <br />')
     if n in [1,2]:
         o.append('                <h1>Полуфинал {}</h1>'.format(n))
     else:
         o.append('                <h1>Финал</h1>'.format(n))
-    o.append('                <br />')
-    o.append('                <br />')
     o.append('            </center>')
     o.append('            <div class="datagrid"><table>')
     o.append('               <thead><tr><th>Неделя</th><th>Команда</th><th>Результат (км)</th></thead>')
