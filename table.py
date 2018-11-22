@@ -6,6 +6,10 @@ import pytz
 import os
 from string import Template
 import config
+import sqlite3
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
+
 
 def week_range(date):
     utc=pytz.UTC
@@ -161,16 +165,16 @@ def mkIndex(date):
         weeklog = [t for t in teamlog if t[0]==w]
         print(">>>> Week ", w)
         if weeklog:
-            out = open("out.csv", "a")
-            print(weeklog)
-            a=[]
-            for t in range(1,9):
-                b=[x for x in weeklog if x[1]==t]
-                print(b)
-                a.append(b[0][6])
-            print(w, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], sep=', ', end='\n', file=out)
+#            out = open("out.csv", "a")
+#            print(weeklog)
+#            a=[]
+#            for t in range(1,9):
+#                b=[x for x in weeklog if x[1]==t]
+#                print(b)
+#                a.append(b[0][6])
+#            print(w, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], sep=', ', end='\n', file=out)
             for t in weeklog:
-                c2.execute("INSERT OR REPLACE INTO points VALUES (?,?,?,?)", (t[1], t[0], t[5], t[6]))
+                c2.execute("INSERT OR IGNORE INTO points VALUES (?,?,?,?)", (t[1], t[0], t[5], t[6]))
                 dbs.commit()
             output += printfinalresults(w, weeklog, teams)
     dbs.close()
@@ -282,6 +286,26 @@ def mkTeams(date):
 
 
 def mkStat(date):
+    db = sqlite3.connect('aerobia.db')
+    c1 = db.cursor()
+    weeks = [x[0] for x in c1.execute('SELECT DISTINCT week FROM points ORDER BY week').fetchall()]
+    for t in range(1,9):
+            team = c1.execute('SELECT teamname FROM teams WHERE teamid=?', (t,)).fetchone()[0]
+            a = [x[0] for x in c1.execute('SELECT sumpoints FROM points WHERE teamid=? ORDER BY week', (t,))]
+            print(weeks)
+            print(a)
+            plt.plot(weeks,a, label=team)
+    plt.title('Кубок Аэробии')
+    l = plt.subplot(111)
+    #plt.legend(loc='upper center',  shadow=True, ncol=2)
+    handles, labels = l.get_legend_handles_labels()
+    lgd = l.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5,-0.1))
+    loc = MultipleLocator(25)
+    l.yaxis.tick_right()
+    l.yaxis.set_minor_locator(loc)
+    l.grid(which='minor')
+    plt.savefig('cup.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+
     dolastweek = date.weekday() < 2
     for weeksago in range(0, int(date.strftime("%W"))):
         dodate = date - datetime.timedelta(days=7*weeksago)

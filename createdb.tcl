@@ -9,7 +9,7 @@ db eval {CREATE TABLE log (runid INTEGER PRIMARY KEY, runnerid INTEGER, date, di
 db eval {CREATE TABLE wlog (runnerid INTEGER, week INTEGER, distance REAL, wasill BOOLEAN NOT NULL DEFAULT 0, wplan REAL, PRIMARY KEY(runnerid, week))}
 db eval {CREATE TABLE cup (teamid INTEGER, week INTEGER, distance REAL, PRIMARY KEY(teamid, week))}
 db eval {CREATE TABLE playoff (teamid INTEGER, bracket INTEGER, wins INTEGER DEFAULT 0)}
-db eval {CREATE TABLE points (teamid INTEGER, week INTEGER, points INTEGER, sumpoints INTEGER)}
+db eval {CREATE TABLE points (teamid INTEGER, week INTEGER, points INTEGER, sumpoints INTEGER, PRIMARY KEY(teamid, week))}
 #db eval {CREATE TABLE tlog (teamid INTEGER, week INTEGER, pts INTEGER, result REAL, PRIMARY KEY(teamid, week))}
 #db eval {INSERT INTO teams values (1, "раз")}
 #db eval {INSERT INTO teams values (2, "два")}
