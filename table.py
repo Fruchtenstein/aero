@@ -155,11 +155,25 @@ def mkIndex(date):
         output += printintermediateresults(date, teams, db)
     if dolastweek and date < config.ENDCHM:
         output += printintermediateresults(date - datetime.timedelta(days=7), teams, db)
+    dbs = sqlite3.connect('aerobia.db')
+    c2 = dbs.cursor()
     for w in range(week, 0, -1):
         weeklog = [t for t in teamlog if t[0]==w]
         print(">>>> Week ", w)
         if weeklog:
+            out = open("out.csv", "a")
+            print(weeklog)
+            a=[]
+            for t in range(1,9):
+                b=[x for x in weeklog if x[1]==t]
+                print(b)
+                a.append(b[0][6])
+            print(w, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], sep=', ', end='\n', file=out)
+            for t in weeklog:
+                c2.execute("INSERT OR REPLACE INTO points VALUES (?,?,?,?)", (t[1], t[0], t[5], t[6]))
+                dbs.commit()
             output += printfinalresults(w, weeklog, teams)
+    dbs.close()
 
     if datetime.date.today() >= config.STARTCUP and datetime.date.today() < config.ENDCUP:
         cupoutput = doCup()
