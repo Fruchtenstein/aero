@@ -295,7 +295,7 @@ def mkStat(date):
             print(weeks)
             print(a)
             plt.plot(weeks,a, label=team)
-    plt.title('Кубок Аэробии')
+#    plt.title('')
     l = plt.subplot(111)
     #plt.legend(loc='upper center',  shadow=True, ncol=2)
     handles, labels = l.get_legend_handles_labels()
@@ -304,7 +304,7 @@ def mkStat(date):
     l.yaxis.tick_right()
     l.yaxis.set_minor_locator(loc)
     l.grid(which='minor')
-    plt.savefig('cup.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig('html/cup.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
 
     dolastweek = date.weekday() < 2
     for weeksago in range(0, int(date.strftime("%W"))):
