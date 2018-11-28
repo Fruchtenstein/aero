@@ -80,7 +80,8 @@ for r in runners:
     runnerid = r[0]
 #    isill = r[1]
     db = sqlite3.connect('aerobia.db')
-    goal = db.execute('SELECT goal FROM runners WHERE runnerid=?', (runnerid,)).fetchone()[0]
+    goal = db.execute("SELECT sum(wplan) FROM wlog WHERE runnerid=?", (runnerid, )).fetchone()[0]
+#    goal = db.execute('SELECT goal FROM runners WHERE runnerid=?', (runnerid,)).fetchone()[0]
     ill = db.execute('SELECT wasill FROM wlog WHERE runnerid=? ORDER BY week DESC LIMIT 1', (runnerid,)).fetchone()
     isill = ill[0] if ill else 0
     print(" #### retrieve this week")
@@ -99,7 +100,7 @@ for r in runners:
 #    db.execute('INSERT OR REPLACE INTO wlog VALUES (?, ?, ?, ?)', (runnerid, thisweek[0], thisweekresult, isill))
     db.execute('UPDATE wlog SET distance=?,wasill=? WHERE runnerid=? AND week=?', (thisweekresult, isill, runnerid, thisweek[0]))
     db.commit()
-    if now.weekday() < 2:
+    if now.weekday() < 4:
         print(" #### retrieve last week")
         ill = db.execute('SELECT wasill FROM wlog WHERE runnerid=? AND week=?', (runnerid, lastweek[0])).fetchone()
         wasill = ill[0] if ill else 0
