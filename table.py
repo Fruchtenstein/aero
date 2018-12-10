@@ -440,8 +440,10 @@ def printbracket(n):
     o.append('            <center>')
     o.append('                <br />')
     if n in [1,2]:
+        stage = 0
         o.append('                <h1>Полуфинал {}</h1>'.format(n))
     else:
+        stage = 1
         o.append('                <h1>Финал</h1>'.format(n))
     o.append('            </center>')
     o.append('            <div class="datagrid"><table>')
@@ -456,8 +458,8 @@ def printbracket(n):
         t2 = c1.execute('SELECT teamname FROM teams WHERE teamid=?',(teams[1][0],)).fetchone()[0]
         teamnames = (t1, t2)
     for w in range (0,3):
-        (dist1,) = c1.execute('SELECT COALESCE(distance,0) FROM cup WHERE teamid=? AND week=?', (teams[0][0], startcupweek+w)).fetchone() or (0.0,)
-        (dist2,) = c1.execute('SELECT COALESCE(distance,0) FROM cup WHERE teamid=? AND week=?', (teams[1][0], startcupweek+w)).fetchone() or (0.0,)
+        (dist1,) = c1.execute('SELECT COALESCE(distance,0) FROM cup WHERE teamid=? AND week=?', (teams[0][0], startcupweek+w+3*stage)).fetchone() or (0.0,)
+        (dist2,) = c1.execute('SELECT COALESCE(distance,0) FROM cup WHERE teamid=? AND week=?', (teams[1][0], startcupweek+w+3*stage)).fetchone() or (0.0,)
         print('D1:',dist1)
         print('D2:',dist2)
         if w == 1:
