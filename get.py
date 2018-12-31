@@ -14,6 +14,9 @@ import lxml.etree
 def week_range(date):
     utc=pytz.UTC
     year, week, dow = date.isocalendar()
+    if year==2019:
+        year=2018
+        week=52
     start_date = date - datetime.timedelta(dow-1)
     end_date = start_date + datetime.timedelta(6)
     return (week, utc.localize(datetime.datetime.combine(start_date, datetime.datetime.min.time())), utc.localize(datetime.datetime.combine(end_date, datetime.datetime.max.time())))
@@ -57,6 +60,8 @@ def getdata(runnerid, date, session, dataurl, goal):
 
 print("-------------------- ",datetime.datetime.now())
 now = datetime.date.today()
+if now.year==2019:
+    exit()
 months = {'янв.':1,'фев.':2,'мар.':3,'апр.':4,'мая':5,'июня':6,'июля':7,'авг.':8,'сент.':9,'окт.':10,'нояб.':11,'дек.':12}
 invmonths = {v: k for k, v in months.items()}
 with open('credentials') as f:
@@ -84,7 +89,7 @@ for r in runners:
 #    goal = db.execute('SELECT goal FROM runners WHERE runnerid=?', (runnerid,)).fetchone()[0]
     ill = db.execute('SELECT wasill FROM wlog WHERE runnerid=? ORDER BY week DESC LIMIT 1', (runnerid,)).fetchone()
     isill = ill[0] if ill else 0
-    print(" #### retrieve this week")
+    print(" #### retrieve  week ",thisweek[0])
     parseuser(runnerid, now, s)
     total = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=?', (runnerid,)).fetchone()[0]
     thisweekresult = db.execute('SELECT SUM(distance) FROM log WHERE runnerid=? AND date>? AND date<?', (runnerid, thisweek[1].isoformat(), thisweek[2].isoformat())).fetchone()[0] or 0
@@ -101,7 +106,7 @@ for r in runners:
     db.execute('UPDATE wlog SET distance=?,wasill=? WHERE runnerid=? AND week=?', (thisweekresult, isill, runnerid, thisweek[0]))
     db.commit()
     if now.weekday() < 2:
-        print(" #### retrieve last week")
+        print(" #### retrieve last week ",lastweek[0])
         ill = db.execute('SELECT wasill FROM wlog WHERE runnerid=? AND week=?', (runnerid, lastweek[0])).fetchone()
         wasill = ill[0] if ill else 0
         parseuser(runnerid, weekago, s)

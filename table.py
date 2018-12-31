@@ -14,6 +14,9 @@ from matplotlib.ticker import MultipleLocator
 def week_range(date):
     utc=pytz.UTC
     year, week, dow = date.isocalendar()
+    if year==2019:
+        year=2018
+        week=53
     week = int(date.strftime("%W"))
     start_date = date - datetime.timedelta(dow-1)
     end_date = start_date + datetime.timedelta(6)
@@ -157,7 +160,7 @@ def mkIndex(date):
     output = []
     if date < config.ENDCHM:
         output += printintermediateresults(date, teams, db)
-    if dolastweek and date < config.ENDCHM:
+    if dolastweek:
         output += printintermediateresults(date - datetime.timedelta(days=7), teams, db)
     dbs = sqlite3.connect('aerobia.db')
     c2 = dbs.cursor()
@@ -179,7 +182,7 @@ def mkIndex(date):
             output += printfinalresults(w, weeklog, teams)
     dbs.close()
 
-    if datetime.date.today() >= config.STARTCUP and datetime.date.today() < config.ENDCUP:
+    if datetime.date.today() >= config.STARTCUP: 
         cupoutput = doCup()
     else:
         cupoutput = ['']
