@@ -122,9 +122,15 @@ def mkIndex(date):
     print("date: ", date, "; weekday: ", date.weekday())
     print("do last week = ", dolastweek)
     if dolastweek:
-        week = int(date.strftime("%W")) - 2
+        if date.year == 2019:
+            week = 51
+        else:
+            week = int(date.strftime("%W")) - 2
     else:
-        week = int(date.strftime("%W")) - 1
+        if date.year == 2019:
+            week = 52
+        else:
+            week = int(date.strftime("%W")) - 1
     print("index week:", week)
     db = sqlite3.connect('aerobia.db')
     c1 = db.cursor()
@@ -193,7 +199,7 @@ def mkIndex(date):
     outstr = '\n'.join(output)
     outstr2 = '\n'.join(output2)
     cupstr = '\n'.join(cupoutput)
-    subst = {'cup':cupstr, 'table':outstr, 'table2':outstr2, 'week':date.strftime("%W")}
+    subst = {'cup':cupstr, 'table':outstr, 'table2':outstr2, 'week':week+1}
     result = tpl.substitute(subst)
     inp.close()
     out = open('html/index.html', 'w')
@@ -279,7 +285,7 @@ def mkTeams(date):
         tpl = Template(inp.read())
         outstr = '\n'.join(outteam)
         outbox = '\n'.join(outteambox)
-        subst = {'box':outbox, 'table':outstr, 'week':date.strftime("%W")}
+        subst = {'box':outbox, 'table':outstr, 'week':week}
         result = tpl.substitute(subst)
         inp.close()
         out = open('html/teams{:02d}.html'.format(week), 'w')
@@ -310,7 +316,11 @@ def mkStat(date):
     plt.savefig('html/cup.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
 
     dolastweek = date.weekday() < 2
-    for weeksago in range(0, int(date.strftime("%W"))):
+    if date.year == 2019:
+        wk = 52
+    else:
+        wk = int(date.strftime("%W"))
+    for weeksago in range(0, wk):
         dodate = date - datetime.timedelta(days=7*weeksago)
         w = week_range(dodate)
         week = w[0]
@@ -374,7 +384,7 @@ def mkStat(date):
             outstat.append('    <h1>Результаты недели будут подведены позже</h1>')
         outstr = '\n'.join(outstat)
         outbox = '\n'.join(outstatbox)
-        subst = {'box':outbox, 'data':outstr, 'week':date.strftime("%W")}
+        subst = {'box':outbox, 'data':outstr, 'week':week}
         result = tpl.substitute(subst)
         inp.close()
         out = open('html/statistics{:02d}.html'.format(week), 'w')
