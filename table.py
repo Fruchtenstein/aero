@@ -199,7 +199,7 @@ def mkIndex(date):
     outstr = '\n'.join(output)
     outstr2 = '\n'.join(output2)
     cupstr = '\n'.join(cupoutput)
-    subst = {'cup':cupstr, 'table':outstr, 'table2':outstr2, 'week':week+1}
+    subst = {'cup':cupstr, 'table':outstr, 'table2':outstr2, 'week':week}
     result = tpl.substitute(subst)
     inp.close()
     out = open('html/index.html', 'w')
@@ -395,7 +395,10 @@ def mkStat(date):
 def mkRules(now):
         inp = open('rules.template')
         tpl = Template(inp.read())
-        subst = {'week':now.strftime("%W")}
+        week = now.strftime("%W")
+        if week == 0:
+            week=52
+        subst = {'week':week}
         result = tpl.substitute(subst)
         inp.close()
         out = open('html/rules.html', 'w')
